@@ -69,7 +69,7 @@ Spec Bifrost explores a lighter workflow:
 
 ## Requirements
 
-- Node.js 20 or newer is recommended.
+- Node.js 24 LTS is recommended.
 - npm is required.
 - Claude Code CLI with plugin support is required.
 

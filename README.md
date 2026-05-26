@@ -69,7 +69,7 @@ Spec Bifrost 试图验证一条更轻量的链路：
 
 ## 环境要求
 
-- 推荐 Node.js 20 或更高版本。
+- 推荐 Node.js 24 LTS。
 - 需要 npm。
 - 需要支持 plugin 的 Claude Code CLI。
 
