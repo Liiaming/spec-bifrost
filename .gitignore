@@ -1,0 +1,4 @@
+.worktrees/
+node_modules/
+plugins/spec-bifrost/dist/
+.DS_Store

@@ -1,0 +1,14 @@
+{
+  "name": "spec-bifrost-marketplace",
+  "description": "Spec Bifrost Claude Code 插件市场，用于分发需求原型插件。Marketplace for the Spec Bifrost Claude Code plugin for requirement prototyping.",
+  "owner": {
+    "name": "Spec Bifrost"
+  },
+  "plugins": [
+    {
+      "name": "spec-bifrost",
+      "source": "./plugins/spec-bifrost",
+      "description": "基于本地 JSON 创建、校验、预览并导出页面驱动的 B 端需求原型。Create, validate, preview, and export page-driven B-end requirement prototypes from local JSON."
+    }
+  ]
+}

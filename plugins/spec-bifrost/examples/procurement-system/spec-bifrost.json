@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "1.0",
+  "project": {
+    "name": "采购申请管理系统",
+    "description": "用于创建、审批和跟踪采购申请的内部 B 端系统",
+    "actors": ["申请人", "审批人", "采购专员"]
+  },
+  "optionSets": [
+    {
+      "id": "purchaseType",
+      "label": "采购类型",
+      "options": [
+        { "value": "office", "label": "办公用品" },
+        { "value": "software", "label": "软件服务" },
+        { "value": "fixed_asset", "label": "固定资产" }
+      ]
+    },
+    {
+      "id": "approvalStatus",
+      "label": "审批状态",
+      "options": [
+        { "value": "draft", "label": "草稿" },
+        { "value": "pending", "label": "审批中" },
+        { "value": "approved", "label": "已通过" },
+        { "value": "rejected", "label": "已驳回" }
+      ]
+    },
+    {
+      "id": "supplierLevel",
+      "label": "供应商等级",
+      "options": [
+        { "value": "preferred", "label": "优选供应商" },
+        { "value": "qualified", "label": "合格供应商" },
+        { "value": "temporary", "label": "临时供应商" }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "purchase-list",
+      "title": "采购申请列表",
+      "purpose": "查看、筛选采购申请，并进入详情或新建申请",
+      "route": "/purchases",
+      "type": "list",
+      "nav": { "visible": true, "label": "采购申请", "group": "采购管理", "order": 10 },
+      "notes": ["列表默认展示最近 90 天申请。"],
+      "sections": [
+        {
+          "id": "filters",
+          "title": "筛选条件",
+          "notes": ["筛选条件用于帮助申请人和审批人快速定位申请。"],
+          "components": [
+            {
+              "id": "purchaseFilters",
+              "type": "filterBar",
+              "fields": [
+                { "id": "status", "label": "审批状态", "type": "select", "optionSetId": "approvalStatus", "notes": ["状态口径以审批流程当前节点为准。"] },
+                { "id": "purchaseType", "label": "采购类型", "type": "select", "optionSetId": "purchaseType" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "table",
+          "title": "申请列表",
+          "components": [
+            {
+              "id": "purchaseTable",
+              "type": "table",
+              "columns": [
+                { "id": "requestNo", "label": "申请编号", "type": "text" },
+                { "id": "title", "label": "申请标题", "type": "text" },
+                { "id": "amount", "label": "申请金额", "type": "currency" },
+                { "id": "status", "label": "审批状态", "type": "status", "optionSetId": "approvalStatus" }
+              ],
+              "actions": [
+                { "id": "create", "type": "navigate", "label": "新建申请", "targetPageId": "purchase-edit", "notes": ["申请人从这里发起新的采购申请。"] },
+                { "id": "view", "type": "navigate", "label": "查看详情", "targetPageId": "purchase-detail" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purchase-edit",
+      "title": "新建采购申请",
+      "purpose": "填写采购申请信息并提交审批",
+      "route": "/purchases/new",
+      "type": "form",
+      "nav": { "visible": true, "label": "新建申请", "group": "采购管理", "order": 20 },
+      "sections": [
+        {
+          "id": "baseInfo",
+          "title": "基本信息",
+          "components": [
+            {
+              "id": "purchaseForm",
+              "type": "form",
+              "fields": [
+                { "id": "title", "label": "申请标题", "type": "text", "required": true },
+                { "id": "purchaseType", "label": "采购类型", "type": "select", "optionSetId": "purchaseType", "required": true },
+                { "id": "requester", "label": "申请人", "type": "user", "required": true, "defaultValue": "当前用户" },
+                { "id": "requestDepartment", "label": "申请部门", "type": "department", "required": true },
+                { "id": "amount", "label": "申请金额", "type": "currency", "required": true, "validationRules": ["金额必须大于 0"] },
+                { "id": "lineItemCount", "label": "采购明细数量", "type": "number", "required": true, "validationRules": ["明细数量至少为 1"] },
+                { "id": "expectedArrivalDate", "label": "期望到货日期", "type": "date", "validationRules": ["期望到货日期不能早于提交日期"] },
+                { "id": "supplierLevel", "label": "供应商等级", "type": "select", "optionSetId": "supplierLevel" },
+                { "id": "attachment", "label": "附件", "type": "file", "displayRules": ["软件服务采购需上传报价单；固定资产采购需上传预算说明附件"] },
+                { "id": "budgetNote", "label": "预算说明", "type": "textarea", "requiredWhen": { "fieldId": "amount", "operator": "greaterThan", "value": 50000 }, "notes": ["金额超过 50000 时，预算说明是审批关注点。"] },
+                { "id": "assetUsage", "label": "资产用途", "type": "textarea", "visibleWhen": { "fieldId": "purchaseType", "operator": "equals", "value": "fixed_asset" } }
+              ],
+              "actions": [
+                { "id": "submitNormal", "type": "submitPrototype", "label": "提交普通审批", "targetPageId": "purchase-detail", "actionWhen": { "fieldId": "amount", "operator": "lessThanOrEqual", "value": 50000 }, "message": "已提交普通审批", "notes": ["提交后申请人不能修改明细，只能撤回后重新编辑。"] },
+                { "id": "submitHighAmount", "type": "submitPrototype", "label": "提交大额审批", "targetPageId": "approval-workbench", "actionWhen": { "fieldId": "amount", "operator": "greaterThan", "value": 50000 }, "message": "已进入大额审批路径", "notes": ["超过 50000 的申请需要补充预算说明后进入大额审批。"] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "purchase-detail",
+      "title": "采购申请详情",
+      "purpose": "查看申请信息、明细和审批进度",
+      "route": "/purchases/detail",
+      "type": "detail",
+      "nav": { "visible": false, "label": "申请详情" },
+      "sections": [
+        {
+          "id": "summary",
+          "title": "申请摘要",
+          "components": [
+            {
+              "id": "summaryList",
+              "type": "descriptionList",
+              "fields": [
+                { "id": "requestNo", "label": "申请编号", "type": "text" },
+                { "id": "status", "label": "审批状态", "type": "status", "optionSetId": "approvalStatus" }
+              ]
+            },
+            {
+              "id": "purchaseItems",
+              "type": "table",
+              "columns": [
+                { "id": "itemName", "label": "物品名称", "type": "text" },
+                { "id": "categoryTag", "label": "品类标签", "type": "tag" },
+                { "id": "quantity", "label": "数量", "type": "number" },
+                { "id": "unitPrice", "label": "单价", "type": "currency" }
+              ],
+              "notes": ["采购明细用于研发理解一条申请中可能包含多个采购项。"]
+            },
+            {
+              "id": "approvalSteps",
+              "type": "steps",
+              "notes": ["审批步骤只表达业务状态，不模拟真实审批流。"],
+              "emptyState": { "title": "暂无审批记录" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "approval-workbench",
+      "title": "审批处理",
+      "purpose": "审批人查看待处理申请并填写审批意见",
+      "route": "/approvals",
+      "type": "approval",
+      "nav": { "visible": true, "label": "审批处理", "group": "审批", "order": 30 },
+      "sections": [
+        {
+          "id": "decision",
+          "title": "审批意见",
+          "components": [
+            {
+              "id": "approvalForm",
+              "type": "form",
+              "fields": [
+                {
+                  "id": "decision",
+                  "label": "审批结论",
+                  "type": "radio",
+                  "options": [
+                    { "value": "approved", "label": "通过" },
+                    { "value": "rejected", "label": "驳回" }
+                  ],
+                  "required": true
+                },
+                { "id": "rejectReason", "label": "驳回原因", "type": "textarea", "requiredWhen": { "fieldId": "decision", "operator": "equals", "value": "rejected" } }
+              ],
+              "actions": [
+                { "id": "confirmApproval", "type": "submitPrototype", "label": "提交审批结果" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "supplier-reference",
+      "title": "供应商与品类参考",
+      "purpose": "查看采购品类和供应商选择口径",
+      "route": "/suppliers",
+      "type": "reference",
+      "nav": { "visible": true, "label": "供应商参考", "group": "基础信息", "order": 40 },
+      "sections": [
+        {
+          "id": "supplierCards",
+          "title": "供应商参考",
+          "components": [
+            {
+              "id": "supplierList",
+              "type": "cardList",
+              "notes": ["本页只做参考展示，不提供供应商维护能力。"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

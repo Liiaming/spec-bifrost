@@ -1,0 +1,10 @@
+{
+  "name": "spec-bifrost",
+  "version": "0.1.0",
+  "description": "基于本地 JSON 创建、校验、预览并导出页面驱动的 B 端需求原型。Create, validate, preview, and export page-driven B-end requirement prototypes from local JSON.",
+  "author": {
+    "name": "Spec Bifrost"
+  },
+  "license": "MIT",
+  "keywords": ["requirements", "prototype", "json", "b-end", "product-management"]
+}
