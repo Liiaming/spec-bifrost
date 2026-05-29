@@ -20,6 +20,21 @@ test("hook ignores non spec files", async () => {
   }
 });
 
+test("hook ignores nested spec files outside the project root entry", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "spec-bifrost-hook-"));
+  try {
+    const result = await runPostToolUseValidation({
+      cwd: dir,
+      toolName: "Write",
+      filePath: join(dir, "nested", "spec-bifrost.json")
+    });
+    assert.equal(result.decision, "approve");
+    assert.equal(result.message, "");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test("hook blocks invalid spec facts only", async () => {
   const dir = await mkdtemp(join(tmpdir(), "spec-bifrost-hook-"));
   try {

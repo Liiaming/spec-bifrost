@@ -1,4 +1,4 @@
-import { watch } from "node:fs";
+import { watch, type FSWatcher } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
@@ -58,7 +58,7 @@ export async function startPreviewServer(options: PreviewServerOptions): Promise
   }
 
   load();
-  const watcher = watch(specPath, { persistent: false }, load);
+  const watcher = startSpecWatcher(options.cwd, load, state);
 
   const server = createServer((request, response) => {
     if (request.url === "/health") {
@@ -76,12 +76,45 @@ export async function startPreviewServer(options: PreviewServerOptions): Promise
     response.end(renderPrototypeHtml({ spec, diagnostics: state.getDiagnostics() }));
   });
 
-  await new Promise<void>((resolveStart) => server.listen(options.port, options.host, resolveStart));
+  await new Promise<void>((resolveStart, rejectStart) => {
+    server.once("error", rejectStart);
+    server.listen(options.port, options.host, () => {
+      server.off("error", rejectStart);
+      resolveStart();
+    });
+  });
+  const address = server.address();
+  const port = typeof address === "object" && address !== null ? address.port : options.port;
   return {
-    url: `http://${options.host}:${options.port}`,
+    url: `http://${options.host}:${port}`,
     close: async () => {
-      watcher.close();
+      watcher?.close();
       await new Promise<void>((resolveClose) => server.close(() => resolveClose()));
     }
   };
+}
+
+export function startSpecWatcher(cwd: string, load: () => void, state: PreviewState): FSWatcher | undefined {
+  try {
+    const watcher = watch(cwd, { persistent: false }, (_eventType, filename) => {
+      if (filename === null || filename.toString() === SPEC_FILE_NAME) {
+        load();
+      }
+    });
+    watcher.on("error", (error) => {
+      state.acceptRenderError({
+        type: "data_format_error",
+        jsonPath: "",
+        message: error instanceof Error ? error.message : "Unable to watch spec file."
+      });
+    });
+    return watcher;
+  } catch (error) {
+    state.acceptRenderError({
+      type: "data_format_error",
+      jsonPath: "",
+      message: error instanceof Error ? error.message : "Unable to watch spec file."
+    });
+    return undefined;
+  }
 }

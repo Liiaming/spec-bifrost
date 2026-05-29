@@ -19,6 +19,8 @@
 
 `optionSets` stores reusable option lists only. It is not a business object model and not a rules library.
 
+`project.actors` must be an array of non-empty strings.
+
 Navigation is derived from `pages[].nav`. Do not create a separate top-level navigation tree.
 
 Do not put export instructions in the project JSON. Export behavior is defined by this plugin.
@@ -35,6 +37,13 @@ Each page should include:
 - `sections`
 - optional `nav`
 - optional `notes`
+
+When `nav` is present, it must include:
+
+- `visible`: boolean
+- `label`: non-empty string
+- optional `group`: string
+- optional `order`: number
 
 Supported page types:
 
@@ -65,6 +74,14 @@ Supported component types:
 - `textBlock`
 
 Do not use unsupported components such as chart, tree, calendar, transfer, tour, carousel, rate, colorPicker, qrCode, or watermark in the MVP.
+
+Component and section `title` values, when present, must be non-empty strings.
+
+When `emptyState` is present, it must include:
+
+- `title`: non-empty string
+- optional `description`: non-empty string
+- optional `notes`: array of non-empty strings
 
 ## Fields
 
@@ -103,6 +120,12 @@ Common field properties:
 - `requiredWhen`
 - `notes`
 
+`meaning`, when present, must be a non-empty string.
+
+`required`, when present, must be a boolean.
+
+`validationRules` and `displayRules`, when present, must be arrays of non-empty strings.
+
 ## Actions
 
 Supported action types:
@@ -118,6 +141,8 @@ Supported action types:
 - `showMessage`
 
 `submitPrototype` expresses a product action only. It does not call an API, persist data, or simulate backend behavior.
+
+`message`, when present, must be a non-empty string.
 
 ## Conditions
 
@@ -144,6 +169,13 @@ Supported operators:
 
 Use `all` and `any` for condition groups. Do not use arbitrary expression strings.
 
+Condition leaf objects must include:
+
+- `fieldId`: non-empty string
+- `operator`: one of the supported operators
+
+Condition group objects must include `all` or `any` arrays.
+
 ## Notes
 
 `notes` is a general requirement fact container. It may appear on:
@@ -161,8 +193,13 @@ Use `notes` for product facts that are not stable enough to structure, such as b
 
 ## Reference Integrity
 
+- `pages[].id` must be unique across the file.
+- `optionSets[].id` must be unique across the file.
+- Field ids from `fields` and `columns` must be unique within the same page so condition references are unambiguous.
 - `pageId` must reference an existing page.
 - `fieldId` must reference a field in the current page.
 - `optionSetId` must reference `optionSets`.
 - `action.targetPageId` must reference an existing page.
+- `navigate` actions must include `targetPageId`.
+- `submitPrototype` actions with conditional navigation must include `targetPageId`.
 - Condition field references must exist.

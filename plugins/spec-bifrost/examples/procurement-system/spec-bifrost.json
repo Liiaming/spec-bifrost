@@ -71,7 +71,7 @@
                 { "id": "requestNo", "label": "申请编号", "type": "text" },
                 { "id": "title", "label": "申请标题", "type": "text" },
                 { "id": "amount", "label": "申请金额", "type": "currency" },
-                { "id": "status", "label": "审批状态", "type": "status", "optionSetId": "approvalStatus" }
+                { "id": "approvalStatus", "label": "审批状态", "type": "status", "optionSetId": "approvalStatus" }
               ],
               "actions": [
                 { "id": "create", "type": "navigate", "label": "新建申请", "targetPageId": "purchase-edit", "notes": ["申请人从这里发起新的采购申请。"] },

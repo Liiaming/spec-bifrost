@@ -31,7 +31,20 @@ test("preview server can be imported", async () => {
   assert.equal(typeof module.startPreviewServer, "function");
 });
 
-test("preview loader keeps last known good after render failure", async () => {
+test("preview watcher tolerates missing spec file", async () => {
+  const { startSpecWatcher } = await import("../../src/renderer/server.ts");
+  const dir = await mkdtemp(join(tmpdir(), "spec-bifrost-preview-"));
+  try {
+    const state = createPreviewState();
+    const watcher = startSpecWatcher(dir, () => undefined, state);
+    watcher?.close();
+    assert.ok(watcher === undefined || typeof watcher.close === "function");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("preview loader keeps last known good after invalid spec", async () => {
   const { loadPreviewStateFromSpecPath } = await import("../../src/renderer/server.ts");
   const dir = await mkdtemp(join(tmpdir(), "spec-bifrost-preview-"));
   const specPath = join(dir, "spec-bifrost.json");
@@ -70,8 +83,8 @@ test("preview loader keeps last known good after render failure", async () => {
     await loadPreviewStateFromSpecPath(specPath, state);
 
     assert.deepEqual(state.getLastKnownGood(), goodSpec);
-    assert.equal(state.getDiagnostics()[0]?.type, "component_render_error");
-    assert.match(state.getDiagnostics()[0]?.message ?? "", /render/i);
+    assert.equal(state.getDiagnostics()[0]?.type, "data_format_error");
+    assert.equal(state.getDiagnostics()[0]?.jsonPath, "pages[0].sections[0].components[0].items");
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

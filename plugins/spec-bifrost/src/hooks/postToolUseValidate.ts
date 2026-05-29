@@ -1,4 +1,4 @@
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { SPEC_FILE_NAME } from "../core/constants.js";
 import { formatDiagnostics } from "../core/diagnostics.js";
 import { readSpecFile } from "../core/readSpec.js";
@@ -18,11 +18,11 @@ export async function runPostToolUseValidation(input: HookInput): Promise<HookRe
   if (!["Write", "Edit", "MultiEdit"].includes(input.toolName)) {
     return { decision: "approve", message: "" };
   }
-  if (input.filePath === undefined || basename(input.filePath) !== SPEC_FILE_NAME) {
+  const specPath = resolve(input.cwd, SPEC_FILE_NAME);
+  if (input.filePath === undefined || resolve(input.cwd, input.filePath) !== specPath) {
     return { decision: "approve", message: "" };
   }
 
-  const specPath = resolve(input.cwd, SPEC_FILE_NAME);
   const result = await readSpecFile(specPath);
   if (result.ok) {
     return { decision: "approve", message: "" };
