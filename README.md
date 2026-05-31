@@ -75,7 +75,27 @@ Spec Bifrost 试图验证一条更轻量的链路：
 - 需要 npm。
 - 需要支持 plugin 的 Claude Code CLI 或 OpenAI Codex CLI/Desktop。
 
-## 本地测试安装
+## 安装
+
+从公开 GitHub marketplace 安装，不需要先 clone 仓库：
+
+```bash
+claude plugin marketplace add Liiaming/spec-bifrost
+claude plugin install spec-bifrost@spec-bifrost-marketplace
+```
+
+Codex CLI 也可以直接注册同一个 GitHub marketplace：
+
+```bash
+codex plugin marketplace add Liiaming/spec-bifrost
+codex plugin add spec-bifrost@spec-bifrost-marketplace
+```
+
+在 Codex Desktop 中，注册同一个 marketplace 后，插件会使用 `.codex-plugin/plugin.json` 的 `interface` 元数据在插件界面中展示。
+
+发布版本需要包含 `plugins/spec-bifrost/dist`，这样 marketplace 安装后的 `spec-bifrost` CLI 可以直接运行。发布前请先运行 `npm run build`，并把生成的 `plugins/spec-bifrost/dist` 一起提交。
+
+## 本地开发测试安装
 
 克隆仓库并构建插件：
 
@@ -103,8 +123,6 @@ codex plugin marketplace add /path/to/spec-bifrost
 codex plugin add spec-bifrost@spec-bifrost-marketplace
 codex
 ```
-
-在 Codex Desktop 中，注册同一个本地 marketplace 后，插件会使用 `.codex-plugin/plugin.json` 的 `interface` 元数据在插件界面中展示。
 
 修改插件源码后，先重新构建，再更新测试项目中的本地安装：
 

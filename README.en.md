@@ -75,7 +75,27 @@ Spec Bifrost explores a lighter workflow:
 - npm is required.
 - Claude Code CLI or OpenAI Codex CLI/Desktop with plugin support is required.
 
-## Install for Local Testing
+## Install
+
+Install from the public GitHub marketplace without cloning the repository first:
+
+```bash
+claude plugin marketplace add Liiaming/spec-bifrost
+claude plugin install spec-bifrost@spec-bifrost-marketplace
+```
+
+Codex CLI can register the same GitHub marketplace directly:
+
+```bash
+codex plugin marketplace add Liiaming/spec-bifrost
+codex plugin add spec-bifrost@spec-bifrost-marketplace
+```
+
+In Codex Desktop, after the same marketplace is registered, the plugin uses `.codex-plugin/plugin.json` `interface` metadata for the plugin UI.
+
+Published versions must include `plugins/spec-bifrost/dist` so the installed `spec-bifrost` CLI can run directly after marketplace install. Before publishing, run `npm run build` and commit the generated `plugins/spec-bifrost/dist` files.
+
+## Install for Local Development Testing
 
 Clone the repository and build the plugin:
 
@@ -103,8 +123,6 @@ codex plugin marketplace add /path/to/spec-bifrost
 codex plugin add spec-bifrost@spec-bifrost-marketplace
 codex
 ```
-
-In Codex Desktop, after the same local marketplace is registered, the plugin uses `.codex-plugin/plugin.json` `interface` metadata for the plugin UI.
 
 After changing plugin source code, rebuild first and then update the local test installation:
 

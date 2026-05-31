@@ -1,0 +1,107 @@
+import { watch } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { resolve } from "node:path";
+import { SPEC_FILE_NAME } from "../core/constants.js";
+import { validateSpec } from "../core/validate.js";
+import { renderPrototypeHtml } from "./renderHtml.js";
+import { createPreviewState } from "./state.js";
+export async function loadPreviewStateFromSpecPath(specPath, state) {
+    let raw;
+    try {
+        raw = await readFile(specPath, "utf8");
+    }
+    catch (error) {
+        state.acceptRenderError({
+            type: "data_format_error",
+            jsonPath: "",
+            message: error instanceof Error ? error.message : "Unable to read spec file."
+        });
+        return;
+    }
+    try {
+        const parsed = JSON.parse(raw);
+        const result = validateSpec(parsed);
+        if (!result.ok) {
+            state.acceptRenderError({
+                type: "data_format_error",
+                jsonPath: result.errors[0]?.path ?? "",
+                message: result.errors[0]?.message ?? "Spec validation failed."
+            });
+            return;
+        }
+        renderPrototypeHtml({ spec: parsed, diagnostics: [] });
+        state.acceptGoodSpec(parsed);
+    }
+    catch (error) {
+        state.acceptRenderError({
+            type: error instanceof SyntaxError ? "data_format_error" : "component_render_error",
+            jsonPath: "",
+            message: `Spec render failed: ${error instanceof Error ? error.message : "Unknown render error."}`
+        });
+    }
+}
+export async function startPreviewServer(options) {
+    const state = createPreviewState();
+    const specPath = resolve(options.cwd, SPEC_FILE_NAME);
+    function load() {
+        void loadPreviewStateFromSpecPath(specPath, state);
+    }
+    load();
+    const watcher = startSpecWatcher(options.cwd, load, state);
+    const server = createServer((request, response) => {
+        if (request.url === "/health") {
+            response.writeHead(200, { "content-type": "application/json" });
+            response.end(JSON.stringify({ ok: true }));
+            return;
+        }
+        const spec = state.getLastKnownGood();
+        response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        if (!spec) {
+            response.end("<!doctype html><html><body><h1>Spec Bifrost</h1><p>当前没有可预览的有效 JSON。</p></body></html>");
+            return;
+        }
+        response.end(renderPrototypeHtml({ spec, diagnostics: state.getDiagnostics() }));
+    });
+    await new Promise((resolveStart, rejectStart) => {
+        server.once("error", rejectStart);
+        server.listen(options.port, options.host, () => {
+            server.off("error", rejectStart);
+            resolveStart();
+        });
+    });
+    const address = server.address();
+    const port = typeof address === "object" && address !== null ? address.port : options.port;
+    return {
+        url: `http://${options.host}:${port}`,
+        close: async () => {
+            watcher?.close();
+            await new Promise((resolveClose) => server.close(() => resolveClose()));
+        }
+    };
+}
+export function startSpecWatcher(cwd, load, state) {
+    try {
+        const watcher = watch(cwd, { persistent: false }, (_eventType, filename) => {
+            if (filename === null || filename.toString() === SPEC_FILE_NAME) {
+                load();
+            }
+        });
+        watcher.on("error", (error) => {
+            state.acceptRenderError({
+                type: "data_format_error",
+                jsonPath: "",
+                message: error instanceof Error ? error.message : "Unable to watch spec file."
+            });
+        });
+        return watcher;
+    }
+    catch (error) {
+        state.acceptRenderError({
+            type: "data_format_error",
+            jsonPath: "",
+            message: error instanceof Error ? error.message : "Unable to watch spec file."
+        });
+        return undefined;
+    }
+}

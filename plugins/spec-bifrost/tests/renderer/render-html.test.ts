@@ -26,6 +26,8 @@ test("renderPrototypeHtml renders navigation page and notes toggle text", () => 
   assert.match(html, /采购申请列表/);
   assert.match(html, /采购申请/);
   assert.match(html, /显示备注/);
+  assert.match(html, /列表页/);
+  assert.match(html, /\/list/);
   assert.match(html, /列表页用于日常跟踪/);
 });
 
@@ -125,6 +127,7 @@ test("renderPrototypeHtml renders business components instead of schema cards", 
   assert.match(html, /<select id="field-status"/);
   assert.match(html, /<option value="pending">审批中<\/option>/);
   assert.match(html, /<table class="data-table"/);
+  assert.match(html, /3 个字段 · 3 条示例数据/);
   assert.match(html, /<th>申请编号<\/th>/);
   assert.match(html, /<td>REQ-2026-001<\/td>/);
   assert.match(html, /<button type="button" class="text-button" data-action-button data-action-type="navigate" data-target-page-id="detail">查看详情<\/button>/);

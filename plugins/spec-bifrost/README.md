@@ -47,7 +47,23 @@ Spec Bifrost is a Claude Code and OpenAI Codex plugin for creating page-driven B
 /spec-bifrost:stop
 ```
 
-## Codex 本地安装 / Codex Local Install
+## 安装 / Install
+
+```bash
+claude plugin marketplace add Liiaming/spec-bifrost
+claude plugin install spec-bifrost@spec-bifrost-marketplace
+```
+
+```bash
+codex plugin marketplace add Liiaming/spec-bifrost
+codex plugin add spec-bifrost@spec-bifrost-marketplace
+```
+
+发布版本必须包含 `dist`，安装后 CLI 才能直接运行。
+
+Published versions must include `dist` so the CLI can run immediately after install.
+
+## 本地安装 / Local Install
 
 ```bash
 codex plugin marketplace add /path/to/spec-bifrost
