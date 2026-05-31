@@ -1,0 +1,20 @@
+{
+  "name": "spec-bifrost-marketplace",
+  "interface": {
+    "displayName": "Spec Bifrost"
+  },
+  "plugins": [
+    {
+      "name": "spec-bifrost",
+      "source": {
+        "source": "local",
+        "path": "./plugins/spec-bifrost"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

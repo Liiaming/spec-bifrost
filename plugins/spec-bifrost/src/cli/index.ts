@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { SPEC_FILE_NAME } from "../core/constants.js";
 import { formatDiagnostics } from "../core/diagnostics.js";
 import { readSpecFile } from "../core/readSpec.js";
+import { installPreviewShutdownHandlers } from "./previewLifecycle.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -24,10 +25,7 @@ if (command === "preview") {
   const { startPreviewServer } = await import("../renderer/server.js");
   const server = await startPreviewServer({ cwd, port, host });
   console.log(`Spec Bifrost preview running at ${server.url}`);
-  process.on("SIGINT", async () => {
-    await server.close();
-    process.exit(0);
-  });
+  installPreviewShutdownHandlers(server);
   await new Promise<never>(() => undefined);
 }
 

@@ -1,0 +1,26 @@
+{
+  "name": "spec-bifrost",
+  "version": "0.1.0",
+  "description": "Create, validate, preview, and export page-driven B-end requirement prototypes from local JSON.",
+  "author": {
+    "name": "Spec Bifrost"
+  },
+  "license": "MIT",
+  "keywords": ["requirements", "prototype", "json", "b-end", "product-management"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Spec Bifrost",
+    "shortDescription": "Create requirements prototypes from local JSON",
+    "longDescription": "Spec Bifrost helps Codex create and maintain a local spec-bifrost.json, validate its schema and references, preview a multi-page B-end requirement prototype, and guide frontend/backend Markdown requirement exports.",
+    "developerName": "Spec Bifrost",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Create a Spec Bifrost prototype for this product idea.",
+      "Validate my spec-bifrost.json and fix any issues.",
+      "Preview this Spec Bifrost prototype locally."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}

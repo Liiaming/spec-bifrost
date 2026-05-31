@@ -62,7 +62,8 @@ test("valid page-driven spec passes", () => {
 
 test("unsupported component type fails with facts only", () => {
   const spec = validSpec();
-  spec.pages[0]!.sections[0]!.components[0]!.type = "chart";
+  const component = spec.pages[0]!.sections[0]!.components[0]! as unknown as Record<string, unknown>;
+  component["type"] = "chart";
 
   const result = validateSpec(spec);
 

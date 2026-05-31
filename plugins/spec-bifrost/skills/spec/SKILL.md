@@ -9,7 +9,7 @@ Use this skill when the user asks to create or modify a Spec Bifrost prototype, 
 
 ## Core Rules
 
-- The single source of truth is `${CLAUDE_PROJECT_DIR}/spec-bifrost.json`.
+- The single source of truth is `${CLAUDE_PROJECT_DIR:-$PWD}/spec-bifrost.json`.
 - The user should work through chat. Do not ask the product manager to hand-write JSON.
 - Keep the JSON page-driven.
 - Support a multi-page B-end system, not a single-page flow.

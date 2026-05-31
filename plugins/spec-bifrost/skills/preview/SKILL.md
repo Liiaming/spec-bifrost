@@ -8,7 +8,7 @@ description: Start the local Spec Bifrost preview service for spec-bifrost.json.
 Run:
 
 ```bash
-spec-bifrost preview --cwd "${CLAUDE_PROJECT_DIR}" --host 127.0.0.1 --port 3737
+spec-bifrost preview --cwd "${CLAUDE_PROJECT_DIR:-$PWD}" --host 127.0.0.1 --port 3737
 ```
 
 Open `http://127.0.0.1:3737` in the browser after the service starts.

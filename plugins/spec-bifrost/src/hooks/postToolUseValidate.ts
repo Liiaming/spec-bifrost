@@ -43,7 +43,10 @@ if (process.argv[1] !== undefined && import.meta.url === `file://${process.argv[
   const parsed = raw.length > 0 ? (JSON.parse(raw) as unknown) : {};
   const record = isRecord(parsed) ? parsed : {};
   const toolInput = isRecord(record["tool_input"]) ? record["tool_input"] : {};
-  const cwdValue = typeof record["cwd"] === "string" ? record["cwd"] : process.env["CLAUDE_PROJECT_DIR"] ?? process.cwd();
+  const cwdValue =
+    typeof record["cwd"] === "string"
+      ? record["cwd"]
+      : process.env["CLAUDE_PROJECT_DIR"] ?? process.env["CODEX_PROJECT_DIR"] ?? process.cwd();
   const toolNameValue = typeof record["tool_name"] === "string" ? record["tool_name"] : typeof record["toolName"] === "string" ? record["toolName"] : "";
   const filePathValue = typeof toolInput["file_path"] === "string" ? toolInput["file_path"] : typeof record["filePath"] === "string" ? record["filePath"] : undefined;
 

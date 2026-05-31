@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-Spec Bifrost 是一个 Claude Code 插件，用于把产品经理的自然语言需求沉淀为本地 `spec-bifrost.json`，基于该 JSON 实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
+Spec Bifrost 是一个 Claude Code 和 OpenAI Codex 插件，用于把产品经理的自然语言需求沉淀为本地 `spec-bifrost.json`，基于该 JSON 实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
 
 > 状态：MVP。当前重点是验证“聊天 + 本地 JSON + 实时原型 + 角色裁剪需求文档”的工作流。
 
@@ -12,21 +12,21 @@ Spec Bifrost 是一个 Claude Code 插件，用于把产品经理的自然语言
 
 Spec Bifrost 试图验证一条更轻量的链路：
 
-1. 产品经理通过 Claude Code 聊天描述完整但相对简单的 B 端系统。
-2. Claude Code 创建和修改本地 `spec-bifrost.json`。
+1. 产品经理通过 Claude Code 或 Codex 聊天描述完整但相对简单的 B 端系统。
+2. Claude Code 或 Codex 创建和修改本地 `spec-bifrost.json`。
 3. 插件校验 JSON，并提供本地预览服务。
-4. 产品确认后，Claude 基于 JSON 导出前端关注版和后端关注版需求文档。
+4. 产品确认后，Claude Code 或 Codex 基于 JSON 导出前端关注版和后端关注版需求文档。
 
 ## 能做什么
 
-- 通过 Claude Code skills 引导创建和修改 `spec-bifrost.json`。
+- 通过 Claude Code 或 Codex skills 引导创建和修改 `spec-bifrost.json`。
 - 校验 JSON 语法、schema 和引用完整性。
 - 提供中保真、多页面 B 端原型预览。
 - 支持页面、section、组件、字段、动作和按钮上的 notes。
 - 支持表单、筛选、表格、详情、步骤、卡片、空状态等常见 B 端表达。
 - 支持字段规则、条件显示、条件必填和页面跳转。
 - renderer 使用 last known good 策略，当前 JSON 渲染失败时保留上一版有效预览。
-- 指导 Claude 导出前端版和后端版 Markdown 需求文档。
+- 指导 Claude Code 或 Codex 导出前端版和后端版 Markdown 需求文档。
 
 ## 不做什么
 
@@ -42,10 +42,12 @@ Spec Bifrost 试图验证一条更轻量的链路：
 
 ```txt
 .
+├── .agents/plugins/marketplace.json
 ├── .claude-plugin/marketplace.json
 ├── docs/superpowers/
 ├── plugins/spec-bifrost/
 │   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
 │   ├── bin/spec-bifrost
 │   ├── examples/procurement-system/
 │   ├── hooks/hooks.json
@@ -61,17 +63,17 @@ Spec Bifrost 试图验证一条更轻量的链路：
 ```
 
 - `plugins/spec-bifrost/src/core`：JSON 读取、诊断、schema 和引用校验。
-- `plugins/spec-bifrost/src/hooks`：Claude Code hook 集成。
+- `plugins/spec-bifrost/src/hooks`：Claude Code 和 Codex hook 集成。
 - `plugins/spec-bifrost/src/renderer`：本地预览服务和 HTML 渲染器。
 - `plugins/spec-bifrost/src/cli`：本地 CLI 命令入口。
-- `plugins/spec-bifrost/skills`：Claude Code 命令和工作流说明。
+- `plugins/spec-bifrost/skills`：Claude Code 和 Codex 可加载的技能说明。
 - `plugins/spec-bifrost/tests`：按模块组织的测试。
 
 ## 环境要求
 
 - 推荐 Node.js 24 LTS。
 - 需要 npm。
-- 需要支持 plugin 的 Claude Code CLI。
+- 需要支持 plugin 的 Claude Code CLI 或 OpenAI Codex CLI/Desktop。
 
 ## 本地测试安装
 
@@ -84,7 +86,7 @@ npm install
 npm run build
 ```
 
-在测试项目中使用 local scope 安装插件，避免修改全局 Claude Code 配置：
+在 Claude Code 测试项目中使用 local scope 安装插件，避免修改全局 Claude Code 配置：
 
 ```bash
 mkdir -p ~/Projects/Private/spec-bifrost-test
@@ -93,6 +95,16 @@ claude plugin marketplace add --scope local /path/to/spec-bifrost
 claude plugin install --scope local spec-bifrost@spec-bifrost-marketplace
 claude
 ```
+
+在 Codex CLI 中注册当前仓库作为本地 marketplace，并安装插件：
+
+```bash
+codex plugin marketplace add /path/to/spec-bifrost
+codex plugin add spec-bifrost@spec-bifrost-marketplace
+codex
+```
+
+在 Codex Desktop 中，注册同一个本地 marketplace 后，插件会使用 `.codex-plugin/plugin.json` 的 `interface` 元数据在插件界面中展示。
 
 修改插件源码后，先重新构建，再更新测试项目中的本地安装：
 
@@ -103,7 +115,9 @@ cd ~/Projects/Private/spec-bifrost-test
 claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 ```
 
-## Claude 命令
+Codex 本地 marketplace 安装后，如需刷新源码改动，重新运行 marketplace add 或 remove/add，以当前 Codex CLI 版本的插件命令为准。
+
+## Claude Code / Codex Skills
 
 ```txt
 /spec-bifrost:spec
@@ -111,13 +125,15 @@ claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 /spec-bifrost:preview
 /spec-bifrost:refresh
 /spec-bifrost:export
+/spec-bifrost:stop
 ```
 
-- `/spec-bifrost:spec`：引导 Claude 创建或修改本地原型 JSON。
+- `/spec-bifrost:spec`：引导 Claude Code 或 Codex 创建或修改本地原型 JSON。
 - `/spec-bifrost:validate`：校验语法、schema 和引用。
 - `/spec-bifrost:preview`：启动本地预览服务。
 - `/spec-bifrost:refresh`：让运行中的预览重新读取当前 JSON。
-- `/spec-bifrost:export`：引导 Claude 写入前端版和后端版需求文档。
+- `/spec-bifrost:export`：引导 Claude Code 或 Codex 写入前端版和后端版需求文档。
+- `/spec-bifrost:stop`：排查并手动释放被预览进程占用的 `3737` 端口。
 
 导出文档默认写入：
 
@@ -157,11 +173,18 @@ npm run check
 - `npm test`：运行 `plugins/spec-bifrost/tests` 下的全部测试。
 - `npm run check`：同时执行构建和测试。
 
-Claude Code CLI 可用时，也建议验证插件包：
+Claude Code CLI 可用时，也建议验证 Claude 插件包：
 
 ```bash
 claude plugin validate plugins/spec-bifrost
 claude plugin validate .
+```
+
+Codex CLI 可用时，也建议确认本地 marketplace 能被识别：
+
+```bash
+codex plugin marketplace add /path/to/spec-bifrost
+codex plugin list --marketplace spec-bifrost-marketplace
 ```
 
 ## 设计原则
@@ -169,7 +192,7 @@ claude plugin validate .
 - JSON 是本地项目资产，可见可改，但主路径是聊天驱动。
 - schema 应保持半结构化：足够稳定以支持校验和预览，也足够灵活以承载产品备注。
 - notes 是一等信息，因为 MVP 阶段无法把所有需求细节都安全结构化。
-- hook 和 renderer 只报告错误事实；Claude Code 负责按插件约定修复 JSON。
+- hook 和 renderer 只报告错误事实；Claude Code 或 Codex 负责按插件约定修复 JSON。
 - 导出的文档必须保持需求文档属性，不进入实现方案。
 
 ## 安全

@@ -5,8 +5,8 @@ description: Export frontend and backend Markdown requirement documents from spe
 
 # Spec Bifrost Export
 
-1. Run `spec-bifrost validate --cwd "${CLAUDE_PROJECT_DIR}"`.
-2. If validation passes, read `${CLAUDE_PROJECT_DIR}/spec-bifrost.json`.
+1. Run `spec-bifrost validate --cwd "${CLAUDE_PROJECT_DIR:-$PWD}"`.
+2. If validation passes, read `${CLAUDE_PROJECT_DIR:-$PWD}/spec-bifrost.json`.
 3. Generate:
    - `docs/spec-bifrost/frontend-requirements.md`
    - `docs/spec-bifrost/backend-requirements.md`

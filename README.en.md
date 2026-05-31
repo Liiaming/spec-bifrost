@@ -2,7 +2,7 @@
 
 [中文](README.md)
 
-Spec Bifrost is a Claude Code plugin that turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
+Spec Bifrost is a Claude Code and OpenAI Codex plugin that turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
 
 > Status: MVP. The project focuses on validating the "chat + local JSON + live prototype + role-specific requirement documents" workflow.
 
@@ -12,21 +12,21 @@ Product prototypes are intuitive for people, but not stable enough for AI and en
 
 Spec Bifrost explores a lighter workflow:
 
-1. Product managers describe a complete but relatively simple business-facing system in Claude Code chat.
-2. Claude Code creates and edits the local `spec-bifrost.json`.
+1. Product managers describe a complete but relatively simple business-facing system in Claude Code or Codex chat.
+2. Claude Code or Codex creates and edits the local `spec-bifrost.json`.
 3. The plugin validates the JSON and serves a local preview.
-4. After product confirmation, Claude exports frontend-focused and backend-focused requirement documents from the JSON.
+4. After product confirmation, Claude Code or Codex exports frontend-focused and backend-focused requirement documents from the JSON.
 
 ## What It Does
 
-- Guides Claude Code to create and modify `spec-bifrost.json` through skills.
+- Guides Claude Code or Codex to create and modify `spec-bifrost.json` through skills.
 - Validates JSON syntax, schema, and reference integrity.
 - Provides medium-fidelity, multi-page business-facing prototype previews.
 - Supports notes on pages, sections, components, fields, actions, and buttons.
 - Supports common business UI patterns such as forms, filters, tables, detail views, steps, cards, and empty states.
 - Supports field rules, conditional display, conditional required fields, and page navigation.
 - Uses a last-known-good renderer strategy and keeps the previous valid preview when the current JSON cannot render.
-- Guides Claude to export frontend and backend Markdown requirement documents.
+- Guides Claude Code or Codex to export frontend and backend Markdown requirement documents.
 
 ## What It Does Not Do
 
@@ -42,10 +42,12 @@ Spec Bifrost explores a lighter workflow:
 
 ```txt
 .
+├── .agents/plugins/marketplace.json
 ├── .claude-plugin/marketplace.json
 ├── docs/superpowers/
 ├── plugins/spec-bifrost/
 │   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
 │   ├── bin/spec-bifrost
 │   ├── examples/procurement-system/
 │   ├── hooks/hooks.json
@@ -61,17 +63,17 @@ Spec Bifrost explores a lighter workflow:
 ```
 
 - `plugins/spec-bifrost/src/core`: JSON reading, diagnostics, schema validation, and reference validation.
-- `plugins/spec-bifrost/src/hooks`: Claude Code hook integration.
+- `plugins/spec-bifrost/src/hooks`: Claude Code and Codex hook integration.
 - `plugins/spec-bifrost/src/renderer`: Local preview server and HTML renderer.
 - `plugins/spec-bifrost/src/cli`: Local CLI command entry.
-- `plugins/spec-bifrost/skills`: Claude Code commands and workflow instructions.
+- `plugins/spec-bifrost/skills`: Skill instructions loadable by Claude Code and Codex.
 - `plugins/spec-bifrost/tests`: Tests organized by module.
 
 ## Requirements
 
 - Node.js 24 LTS is recommended.
 - npm is required.
-- Claude Code CLI with plugin support is required.
+- Claude Code CLI or OpenAI Codex CLI/Desktop with plugin support is required.
 
 ## Install for Local Testing
 
@@ -84,7 +86,7 @@ npm install
 npm run build
 ```
 
-Install the plugin into a test project with local scope, so global Claude Code configuration is not changed:
+Install the plugin into a Claude Code test project with local scope, so global Claude Code configuration is not changed:
 
 ```bash
 mkdir -p ~/Projects/Private/spec-bifrost-test
@@ -93,6 +95,16 @@ claude plugin marketplace add --scope local /path/to/spec-bifrost
 claude plugin install --scope local spec-bifrost@spec-bifrost-marketplace
 claude
 ```
+
+For Codex CLI, register this repository as a local marketplace and add the plugin:
+
+```bash
+codex plugin marketplace add /path/to/spec-bifrost
+codex plugin add spec-bifrost@spec-bifrost-marketplace
+codex
+```
+
+In Codex Desktop, after the same local marketplace is registered, the plugin uses `.codex-plugin/plugin.json` `interface` metadata for the plugin UI.
 
 After changing plugin source code, rebuild first and then update the local test installation:
 
@@ -103,7 +115,9 @@ cd ~/Projects/Private/spec-bifrost-test
 claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 ```
 
-## Claude Commands
+For a Codex local marketplace install, rerun marketplace add or remove/add to refresh source changes, depending on the Codex CLI version in use.
+
+## Claude Code / Codex Skills
 
 ```txt
 /spec-bifrost:spec
@@ -111,13 +125,15 @@ claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 /spec-bifrost:preview
 /spec-bifrost:refresh
 /spec-bifrost:export
+/spec-bifrost:stop
 ```
 
-- `/spec-bifrost:spec`: Guides Claude to create or modify the local prototype JSON.
+- `/spec-bifrost:spec`: Guides Claude Code or Codex to create or modify the local prototype JSON.
 - `/spec-bifrost:validate`: Validates syntax, schema, and references.
 - `/spec-bifrost:preview`: Starts the local preview server.
 - `/spec-bifrost:refresh`: Asks the running preview to reload the current JSON.
-- `/spec-bifrost:export`: Guides Claude to write frontend and backend requirement documents.
+- `/spec-bifrost:export`: Guides Claude Code or Codex to write frontend and backend requirement documents.
+- `/spec-bifrost:stop`: Inspects and manually frees port `3737` when it is still held by a preview process.
 
 Exported documents are expected at:
 
@@ -157,11 +173,18 @@ npm run check
 - `npm test`: Runs all tests under `plugins/spec-bifrost/tests`.
 - `npm run check`: Runs build and tests together.
 
-When Claude Code CLI is available, validate the plugin package too:
+When Claude Code CLI is available, validate the Claude plugin package too:
 
 ```bash
 claude plugin validate plugins/spec-bifrost
 claude plugin validate .
+```
+
+When Codex CLI is available, confirm that the local marketplace is visible:
+
+```bash
+codex plugin marketplace add /path/to/spec-bifrost
+codex plugin list --marketplace spec-bifrost-marketplace
 ```
 
 ## Design Principles
@@ -169,7 +192,7 @@ claude plugin validate .
 - The JSON file is a local project asset, visible and editable, but the primary workflow is chat-driven.
 - The schema should be semi-structured: stable enough for validation and preview, flexible enough for product notes.
 - Notes are first-class because not every requirement detail can be safely structured in the MVP.
-- Hooks and the renderer report error facts only; Claude Code decides how to repair JSON according to plugin conventions.
+- Hooks and the renderer report error facts only; Claude Code or Codex decides how to repair JSON according to plugin conventions.
 - Exported documents must remain requirement documents and must not become implementation plans.
 
 ## Security

@@ -10,7 +10,7 @@ Use this when the preview service is already running and the user wants a manual
 Run:
 
 ```bash
-spec-bifrost refresh --cwd "${CLAUDE_PROJECT_DIR}"
+spec-bifrost refresh --cwd "${CLAUDE_PROJECT_DIR:-$PWD}"
 ```
 
 The command validates the current `spec-bifrost.json`. A running preview service also watches the file and reloads automatically after the JSON changes.
