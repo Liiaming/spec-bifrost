@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { formatDiagnostics } from "../../src/core/diagnostics.ts";
 import { validateSpec } from "../../src/core/validate.ts";
 import type { SpecBifrostDocument } from "../../src/core/types.ts";
 
@@ -105,6 +106,19 @@ test("missing optionSetId fails as reference error", () => {
   assert.equal(result.errors[0]?.type, "reference_error");
   assert.equal(result.errors[0]?.path, "pages[0].sections[0].components[0].fields[0].optionSetId");
   assert.equal(result.errors[0]?.value, "missingStatus");
+});
+
+test("diagnostics include page component and field context", () => {
+  const spec = validSpec();
+  spec.pages[0]!.sections[0]!.components[0]!.fields![0]!.optionSetId = "missingStatus";
+
+  const result = validateSpec(spec);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.errors[0]?.context, "page purchase-list > component statusFilter > field status");
+
+  const output = formatDiagnostics("Spec Bifrost validation failed", result.errors);
+  assert.match(output, /context: page purchase-list > component statusFilter > field status/);
 });
 
 test("missing action target page fails as reference error", () => {

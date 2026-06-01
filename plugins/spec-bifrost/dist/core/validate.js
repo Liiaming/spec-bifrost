@@ -41,140 +41,144 @@ function validatePage(page, path, errors) {
         errors.push(error("schema_error", path, "page must be an object.", page));
         return;
     }
-    requireString(page.id, `${path}.id`, errors);
-    requireString(page.title, `${path}.title`, errors);
-    requireString(page.purpose, `${path}.purpose`, errors);
-    requireString(page.route, `${path}.route`, errors);
+    const pageContext = contextPart("page", page.id);
+    requireString(page.id, `${path}.id`, errors, pageContext);
+    requireString(page.title, `${path}.title`, errors, pageContext);
+    requireString(page.purpose, `${path}.purpose`, errors, pageContext);
+    requireString(page.route, `${path}.route`, errors, pageContext);
     if (!SUPPORTED_PAGE_TYPES.includes(page.type)) {
-        errors.push(error("schema_error", `${path}.type`, `Unsupported page type "${String(page.type)}".`, page.type));
+        errors.push(error("schema_error", `${path}.type`, `Unsupported page type "${String(page.type)}".`, page.type, pageContext));
     }
-    validateNavigation(page.nav, `${path}.nav`, errors);
-    validateNotes(page.notes, `${path}.notes`, errors);
+    validateNavigation(page.nav, `${path}.nav`, errors, pageContext);
+    validateNotes(page.notes, `${path}.notes`, errors, pageContext);
     if (!Array.isArray(page.sections)) {
-        errors.push(error("schema_error", `${path}.sections`, "sections must be an array.", page.sections));
+        errors.push(error("schema_error", `${path}.sections`, "sections must be an array.", page.sections, pageContext));
         return;
     }
     page.sections.forEach((section, sectionIndex) => {
         const sectionPath = `${path}.sections[${sectionIndex}]`;
         if (!isRecord(section)) {
-            errors.push(error("schema_error", sectionPath, "section must be an object.", section));
+            errors.push(error("schema_error", sectionPath, "section must be an object.", section, pageContext));
             return;
         }
-        validateOptionalString(section.title, `${sectionPath}.title`, errors);
-        validateNotes(section.notes, `${sectionPath}.notes`, errors);
+        validateOptionalString(section.title, `${sectionPath}.title`, errors, pageContext);
+        validateNotes(section.notes, `${sectionPath}.notes`, errors, pageContext);
         if (!Array.isArray(section.components)) {
-            errors.push(error("schema_error", `${sectionPath}.components`, "components must be an array.", section.components));
+            errors.push(error("schema_error", `${sectionPath}.components`, "components must be an array.", section.components, pageContext));
             return;
         }
         section.components.forEach((component, componentIndex) => {
-            validateComponent(component, `${sectionPath}.components[${componentIndex}]`, errors);
+            validateComponent(component, `${sectionPath}.components[${componentIndex}]`, errors, pageContext);
         });
     });
 }
-function validateComponent(component, path, errors) {
+function validateComponent(component, path, errors, pageContext) {
     if (!isRecord(component)) {
-        errors.push(error("schema_error", path, "component must be an object.", component));
+        errors.push(error("schema_error", path, "component must be an object.", component, pageContext));
         return;
     }
-    requireString(component.id, `${path}.id`, errors);
+    const componentContext = joinContext(pageContext, contextPart("component", component.id));
+    requireString(component.id, `${path}.id`, errors, componentContext);
     if (!SUPPORTED_COMPONENT_TYPES.includes(component.type)) {
-        errors.push(error("schema_error", `${path}.type`, `Unsupported component type "${String(component.type)}".`, component.type));
+        errors.push(error("schema_error", `${path}.type`, `Unsupported component type "${String(component.type)}".`, component.type, componentContext));
     }
-    validateOptionalString(component.title, `${path}.title`, errors);
-    validateEmptyState(component.emptyState, `${path}.emptyState`, errors);
-    validateNotes(component.notes, `${path}.notes`, errors);
-    validateOptionalArray(component.fields, `${path}.fields`, "fields", errors)?.forEach((field, fieldIndex) => validateField(field, `${path}.fields[${fieldIndex}]`, errors));
-    validateOptionalArray(component.columns, `${path}.columns`, "columns", errors)?.forEach((field, fieldIndex) => validateField(field, `${path}.columns[${fieldIndex}]`, errors));
-    validateOptionalArray(component.actions, `${path}.actions`, "actions", errors)?.forEach((action, actionIndex) => validateAction(action, `${path}.actions[${actionIndex}]`, errors));
-    validateOptionalArray(component.items, `${path}.items`, "items", errors);
+    validateOptionalString(component.title, `${path}.title`, errors, componentContext);
+    validateEmptyState(component.emptyState, `${path}.emptyState`, errors, componentContext);
+    validateNotes(component.notes, `${path}.notes`, errors, componentContext);
+    validateOptionalArray(component.fields, `${path}.fields`, "fields", errors, componentContext)?.forEach((field, fieldIndex) => validateField(field, `${path}.fields[${fieldIndex}]`, errors, componentContext));
+    validateOptionalArray(component.columns, `${path}.columns`, "columns", errors, componentContext)?.forEach((field, fieldIndex) => validateField(field, `${path}.columns[${fieldIndex}]`, errors, componentContext));
+    validateOptionalArray(component.actions, `${path}.actions`, "actions", errors, componentContext)?.forEach((action, actionIndex) => validateAction(action, `${path}.actions[${actionIndex}]`, errors, componentContext));
+    validateOptionalArray(component.items, `${path}.items`, "items", errors, componentContext);
 }
-function validateField(field, path, errors) {
+function validateField(field, path, errors, componentContext) {
     if (!isRecord(field)) {
-        errors.push(error("schema_error", path, "field must be an object.", field));
+        errors.push(error("schema_error", path, "field must be an object.", field, componentContext));
         return;
     }
-    requireString(field.id, `${path}.id`, errors);
-    requireString(field.label, `${path}.label`, errors);
+    const fieldContext = joinContext(componentContext, contextPart("field", field.id));
+    requireString(field.id, `${path}.id`, errors, fieldContext);
+    requireString(field.label, `${path}.label`, errors, fieldContext);
     if (!SUPPORTED_FIELD_TYPES.includes(field.type)) {
-        errors.push(error("schema_error", `${path}.type`, `Unsupported field type "${String(field.type)}".`, field.type));
+        errors.push(error("schema_error", `${path}.type`, `Unsupported field type "${String(field.type)}".`, field.type, fieldContext));
     }
-    validateOptionalString(field.meaning, `${path}.meaning`, errors);
-    validateOptionalBoolean(field.required, `${path}.required`, errors);
-    validateNotes(field.notes, `${path}.notes`, errors);
-    validateCondition(field.visibleWhen, `${path}.visibleWhen`, errors);
-    validateCondition(field.enabledWhen, `${path}.enabledWhen`, errors);
-    validateCondition(field.requiredWhen, `${path}.requiredWhen`, errors);
-    validateOptionValues(field.options, `${path}.options`, errors);
-    validateStringArray(field.validationRules, `${path}.validationRules`, "validationRules", errors);
-    validateStringArray(field.displayRules, `${path}.displayRules`, "displayRules", errors);
+    validateOptionalString(field.meaning, `${path}.meaning`, errors, fieldContext);
+    validateOptionalBoolean(field.required, `${path}.required`, errors, fieldContext);
+    validateNotes(field.notes, `${path}.notes`, errors, fieldContext);
+    validateCondition(field.visibleWhen, `${path}.visibleWhen`, errors, fieldContext);
+    validateCondition(field.enabledWhen, `${path}.enabledWhen`, errors, fieldContext);
+    validateCondition(field.requiredWhen, `${path}.requiredWhen`, errors, fieldContext);
+    validateOptionValues(field.options, `${path}.options`, errors, false, fieldContext);
+    validateStringArray(field.validationRules, `${path}.validationRules`, "validationRules", errors, fieldContext);
+    validateStringArray(field.displayRules, `${path}.displayRules`, "displayRules", errors, fieldContext);
 }
-function validateAction(action, path, errors) {
+function validateAction(action, path, errors, componentContext) {
     if (!isRecord(action)) {
-        errors.push(error("schema_error", path, "action must be an object.", action));
+        errors.push(error("schema_error", path, "action must be an object.", action, componentContext));
         return;
     }
-    requireString(action.id, `${path}.id`, errors);
-    requireString(action.label, `${path}.label`, errors);
+    const actionContext = joinContext(componentContext, contextPart("action", action.id));
+    requireString(action.id, `${path}.id`, errors, actionContext);
+    requireString(action.label, `${path}.label`, errors, actionContext);
     if (!SUPPORTED_ACTION_TYPES.includes(action.type)) {
-        errors.push(error("schema_error", `${path}.type`, `Unsupported action type "${String(action.type)}".`, action.type));
+        errors.push(error("schema_error", `${path}.type`, `Unsupported action type "${String(action.type)}".`, action.type, actionContext));
     }
     if (requiresTargetPage(action) && (typeof action.targetPageId !== "string" || action.targetPageId.length === 0)) {
-        errors.push(error("schema_error", `${path}.targetPageId`, "targetPageId is required for this action.", action.targetPageId));
+        errors.push(error("schema_error", `${path}.targetPageId`, "targetPageId is required for this action.", action.targetPageId, actionContext));
     }
-    validateOptionalString(action.message, `${path}.message`, errors);
-    validateNotes(action.notes, `${path}.notes`, errors);
-    validateCondition(action.actionWhen, `${path}.actionWhen`, errors);
+    validateOptionalString(action.message, `${path}.message`, errors, actionContext);
+    validateNotes(action.notes, `${path}.notes`, errors, actionContext);
+    validateCondition(action.actionWhen, `${path}.actionWhen`, errors, actionContext);
 }
-function validateCondition(condition, path, errors) {
+function validateCondition(condition, path, errors, context) {
     if (condition === undefined)
         return;
     if (!isRecord(condition)) {
-        errors.push(error("schema_error", path, "condition must be an object.", condition));
+        errors.push(error("schema_error", path, "condition must be an object.", condition, context));
         return;
     }
     const record = condition;
     const operator = record["operator"];
     const hasGroup = Array.isArray(record["all"]) || Array.isArray(record["any"]);
     if (!hasGroup && (typeof record["fieldId"] !== "string" || record["fieldId"].length === 0)) {
-        errors.push(error("schema_error", `${path}.fieldId`, "fieldId is required for condition leaf objects.", record["fieldId"]));
+        errors.push(error("schema_error", `${path}.fieldId`, "fieldId is required for condition leaf objects.", record["fieldId"], context));
     }
     if (!hasGroup && typeof operator !== "string") {
-        errors.push(error("schema_error", `${path}.operator`, "operator is required for condition leaf objects.", operator));
+        errors.push(error("schema_error", `${path}.operator`, "operator is required for condition leaf objects.", operator, context));
     }
     if (operator !== undefined && (typeof operator !== "string" || !SUPPORTED_CONDITION_OPERATORS.includes(operator))) {
-        errors.push(error("schema_error", `${path}.operator`, `Unsupported condition operator "${String(operator)}".`, operator));
+        errors.push(error("schema_error", `${path}.operator`, `Unsupported condition operator "${String(operator)}".`, operator, context));
     }
     const all = record["all"];
     if (Array.isArray(all)) {
-        all.forEach((child, index) => validateCondition(child, `${path}.all[${index}]`, errors));
+        all.forEach((child, index) => validateCondition(child, `${path}.all[${index}]`, errors, context));
     }
     else if (all !== undefined) {
-        errors.push(error("schema_error", `${path}.all`, "all must be an array.", all));
+        errors.push(error("schema_error", `${path}.all`, "all must be an array.", all, context));
     }
     const any = record["any"];
     if (Array.isArray(any)) {
-        any.forEach((child, index) => validateCondition(child, `${path}.any[${index}]`, errors));
+        any.forEach((child, index) => validateCondition(child, `${path}.any[${index}]`, errors, context));
     }
     else if (any !== undefined) {
-        errors.push(error("schema_error", `${path}.any`, "any must be an array.", any));
+        errors.push(error("schema_error", `${path}.any`, "any must be an array.", any, context));
     }
 }
-function validateNavigation(nav, path, errors) {
+function validateNavigation(nav, path, errors, context) {
     if (nav === undefined)
         return;
     if (!isRecord(nav)) {
-        errors.push(error("schema_error", path, "nav must be an object.", nav));
+        errors.push(error("schema_error", path, "nav must be an object.", nav, context));
         return;
     }
     if (typeof nav["visible"] !== "boolean") {
-        errors.push(error("schema_error", `${path}.visible`, "visible must be a boolean.", nav["visible"]));
+        errors.push(error("schema_error", `${path}.visible`, "visible must be a boolean.", nav["visible"], context));
     }
-    requireString(nav["label"], `${path}.label`, errors);
+    requireString(nav["label"], `${path}.label`, errors, context);
     if (nav["group"] !== undefined && typeof nav["group"] !== "string") {
-        errors.push(error("schema_error", `${path}.group`, "group must be a string.", nav["group"]));
+        errors.push(error("schema_error", `${path}.group`, "group must be a string.", nav["group"], context));
     }
     if (nav["order"] !== undefined && typeof nav["order"] !== "number") {
-        errors.push(error("schema_error", `${path}.order`, "order must be a number.", nav["order"]));
+        errors.push(error("schema_error", `${path}.order`, "order must be a number.", nav["order"], context));
     }
 }
 function requiresTargetPage(action) {
@@ -220,18 +224,19 @@ function validateReferences(spec, errors) {
                 if (!isRecord(component))
                     return;
                 const componentPath = `pages[${pageIndex}].sections[${sectionIndex}].components[${componentIndex}]`;
+                const componentContext = joinContext(contextPart("page", page["id"]), contextPart("component", component["id"]));
                 if (Array.isArray(component.fields)) {
                     component.fields.forEach((field, fieldIndex) => {
                         if (!isRecord(field))
                             return;
-                        validateFieldReferences(field, `${componentPath}.fields[${fieldIndex}]`, optionSetIds, fieldIds, errors);
+                        validateFieldReferences(field, `${componentPath}.fields[${fieldIndex}]`, optionSetIds, fieldIds, errors, componentContext);
                     });
                 }
                 if (Array.isArray(component.columns)) {
                     component.columns.forEach((field, fieldIndex) => {
                         if (!isRecord(field))
                             return;
-                        validateFieldReferences(field, `${componentPath}.columns[${fieldIndex}]`, optionSetIds, fieldIds, errors);
+                        validateFieldReferences(field, `${componentPath}.columns[${fieldIndex}]`, optionSetIds, fieldIds, errors, componentContext);
                     });
                 }
                 if (Array.isArray(component.actions)) {
@@ -239,11 +244,12 @@ function validateReferences(spec, errors) {
                         if (!isRecord(action))
                             return;
                         const actionPath = `${componentPath}.actions[${actionIndex}]`;
+                        const actionContext = joinContext(componentContext, contextPart("action", action["id"]));
                         const targetPageId = action["targetPageId"];
                         if (typeof targetPageId === "string" && !pageIds.has(targetPageId)) {
-                            errors.push(error("reference_error", `${actionPath}.targetPageId`, `targetPageId "${targetPageId}" does not match any page id.`, targetPageId));
+                            errors.push(error("reference_error", `${actionPath}.targetPageId`, `targetPageId "${targetPageId}" does not match any page id.`, targetPageId, actionContext));
                         }
-                        validateConditionReferences(action["actionWhen"], `${actionPath}.actionWhen`, fieldIds, errors);
+                        validateConditionReferences(action["actionWhen"], `${actionPath}.actionWhen`, fieldIds, errors, actionContext);
                     });
                 }
             });
@@ -268,13 +274,14 @@ function validateUniqueIds(spec, errors) {
                 if (!isRecord(component))
                     return;
                 const componentPath = `pages[${pageIndex}].sections[${sectionIndex}].components[${componentIndex}]`;
-                collectUniqueFieldIds(component["fields"], `${componentPath}.fields`, fieldIds, errors);
-                collectUniqueFieldIds(component["columns"], `${componentPath}.columns`, fieldIds, errors);
+                const componentContext = joinContext(contextPart("page", page["id"]), contextPart("component", component["id"]));
+                collectUniqueFieldIds(component["fields"], `${componentPath}.fields`, fieldIds, errors, componentContext);
+                collectUniqueFieldIds(component["columns"], `${componentPath}.columns`, fieldIds, errors, componentContext);
             });
         });
     });
 }
-function collectUniqueFieldIds(fields, path, knownIds, errors) {
+function collectUniqueFieldIds(fields, path, knownIds, errors, componentContext) {
     if (!Array.isArray(fields))
         return;
     fields.forEach((field, fieldIndex) => {
@@ -282,8 +289,9 @@ function collectUniqueFieldIds(fields, path, knownIds, errors) {
             return;
         const duplicateOf = knownIds.get(field["id"]);
         const fieldPath = `${path}[${fieldIndex}].id`;
+        const fieldContext = joinContext(componentContext, contextPart("field", field["id"]));
         if (duplicateOf) {
-            errors.push(error("schema_error", fieldPath, `Duplicate field id "${field["id"]}" also appears at ${duplicateOf}.`, field["id"]));
+            errors.push(error("schema_error", fieldPath, `Duplicate field id "${field["id"]}" also appears at ${duplicateOf}.`, field["id"], fieldContext));
             return;
         }
         knownIds.set(field["id"], fieldPath);
@@ -303,70 +311,71 @@ function validateUniqueStringIds(values, path, errors) {
         knownIds.set(value.id, idPath);
     });
 }
-function validateFieldReferences(field, path, optionSetIds, fieldIds, errors) {
+function validateFieldReferences(field, path, optionSetIds, fieldIds, errors, componentContext) {
+    const fieldContext = joinContext(componentContext, contextPart("field", field.id));
     if (field.optionSetId !== undefined && !optionSetIds.has(field.optionSetId)) {
-        errors.push(error("reference_error", `${path}.optionSetId`, `optionSetId "${field.optionSetId}" does not exist.`, field.optionSetId));
+        errors.push(error("reference_error", `${path}.optionSetId`, `optionSetId "${field.optionSetId}" does not exist.`, field.optionSetId, fieldContext));
     }
-    validateConditionReferences(field.visibleWhen, `${path}.visibleWhen`, fieldIds, errors);
-    validateConditionReferences(field.enabledWhen, `${path}.enabledWhen`, fieldIds, errors);
-    validateConditionReferences(field.requiredWhen, `${path}.requiredWhen`, fieldIds, errors);
+    validateConditionReferences(field.visibleWhen, `${path}.visibleWhen`, fieldIds, errors, fieldContext);
+    validateConditionReferences(field.enabledWhen, `${path}.enabledWhen`, fieldIds, errors, fieldContext);
+    validateConditionReferences(field.requiredWhen, `${path}.requiredWhen`, fieldIds, errors, fieldContext);
 }
-function validateConditionReferences(condition, path, fieldIds, errors) {
+function validateConditionReferences(condition, path, fieldIds, errors, context) {
     if (condition === undefined)
         return;
     if (!isRecord(condition))
         return;
     const fieldId = condition["fieldId"];
     if (typeof fieldId === "string" && !fieldIds.has(fieldId)) {
-        errors.push(error("reference_error", `${path}.fieldId`, `fieldId "${fieldId}" does not exist in the current page.`, fieldId));
+        errors.push(error("reference_error", `${path}.fieldId`, `fieldId "${fieldId}" does not exist in the current page.`, fieldId, context));
     }
     if (Array.isArray(condition.all)) {
-        condition.all.forEach((child, index) => validateConditionReferences(child, `${path}.all[${index}]`, fieldIds, errors));
+        condition.all.forEach((child, index) => validateConditionReferences(child, `${path}.all[${index}]`, fieldIds, errors, context));
     }
     if (Array.isArray(condition.any)) {
-        condition.any.forEach((child, index) => validateConditionReferences(child, `${path}.any[${index}]`, fieldIds, errors));
+        condition.any.forEach((child, index) => validateConditionReferences(child, `${path}.any[${index}]`, fieldIds, errors, context));
     }
 }
-function validateNotes(notes, path, errors) {
+function validateNotes(notes, path, errors, context) {
     if (notes === undefined)
         return;
     if (!Array.isArray(notes) || notes.some((note) => typeof note !== "string")) {
-        errors.push(error("schema_error", path, "notes must be an array of strings.", notes));
+        errors.push(error("schema_error", path, "notes must be an array of strings.", notes, context));
     }
 }
-function validateEmptyState(emptyState, path, errors) {
+function validateEmptyState(emptyState, path, errors, context) {
     if (emptyState === undefined)
         return;
     if (!isRecord(emptyState)) {
-        errors.push(error("schema_error", path, "emptyState must be an object.", emptyState));
+        errors.push(error("schema_error", path, "emptyState must be an object.", emptyState, context));
         return;
     }
-    requireString(emptyState["title"], `${path}.title`, errors);
-    validateOptionalString(emptyState["description"], `${path}.description`, errors);
-    validateNotes(emptyState["notes"], `${path}.notes`, errors);
+    requireString(emptyState["title"], `${path}.title`, errors, context);
+    validateOptionalString(emptyState["description"], `${path}.description`, errors, context);
+    validateNotes(emptyState["notes"], `${path}.notes`, errors, context);
 }
-function validateOptionalString(value, path, errors) {
+function validateOptionalString(value, path, errors, context) {
     if (value === undefined)
         return;
-    requireString(value, path, errors);
+    requireString(value, path, errors, context);
 }
-function validateOptionalBoolean(value, path, errors) {
+function validateOptionalBoolean(value, path, errors, context) {
     if (value === undefined)
         return;
     if (typeof value !== "boolean") {
-        errors.push(error("schema_error", path, "value must be a boolean.", value));
+        errors.push(error("schema_error", path, "value must be a boolean.", value, context));
     }
 }
-function validateStringArray(value, path, label, errors) {
+function validateStringArray(value, path, label, errors, context) {
     if (value === undefined)
         return;
     if (!Array.isArray(value)) {
-        errors.push(error("schema_error", path, `${label} must be an array.`, value));
+        errors.push(error("schema_error", path, `${label} must be an array.`, value, context));
         return;
     }
     value.forEach((item, index) => {
         if (typeof item !== "string" || item.length === 0) {
-            errors.push(error("schema_error", `${path}[${index}]`, "value must be a non-empty string.", item));
+            errors.push(error("schema_error", `${path}[${index}]`, "value must be a non-empty string.", item, context));
         }
     });
 }
@@ -375,45 +384,53 @@ function validateOptionSet(optionSet, path, errors) {
         errors.push(error("schema_error", path, "optionSet must be an object.", optionSet));
         return;
     }
-    requireString(optionSet.id, `${path}.id`, errors);
-    requireString(optionSet.label, `${path}.label`, errors);
-    validateOptionValues(optionSet.options, `${path}.options`, errors, true);
+    const optionSetContext = contextPart("optionSet", optionSet.id);
+    requireString(optionSet.id, `${path}.id`, errors, optionSetContext);
+    requireString(optionSet.label, `${path}.label`, errors, optionSetContext);
+    validateOptionValues(optionSet.options, `${path}.options`, errors, true, optionSetContext);
 }
-function validateOptionValues(value, path, errors, required = false) {
+function validateOptionValues(value, path, errors, required = false, context) {
     if (value === undefined) {
         if (required)
-            errors.push(error("schema_error", path, "options must be an array.", value));
+            errors.push(error("schema_error", path, "options must be an array.", value, context));
         return;
     }
-    validateOptionalArray(value, path, "options", errors)?.forEach((option, optionIndex) => {
+    validateOptionalArray(value, path, "options", errors, context)?.forEach((option, optionIndex) => {
         if (!isRecord(option)) {
-            errors.push(error("schema_error", `${path}[${optionIndex}]`, "option must be an object.", option));
+            errors.push(error("schema_error", `${path}[${optionIndex}]`, "option must be an object.", option, context));
             return;
         }
-        requireString(option.value, `${path}[${optionIndex}].value`, errors);
-        requireString(option.label, `${path}[${optionIndex}].label`, errors);
+        requireString(option.value, `${path}[${optionIndex}].value`, errors, context);
+        requireString(option.label, `${path}[${optionIndex}].label`, errors, context);
     });
 }
-function validateOptionalArray(value, path, label, errors) {
+function validateOptionalArray(value, path, label, errors, context) {
     if (value === undefined)
         return undefined;
     if (!Array.isArray(value)) {
-        errors.push(error("schema_error", path, `${label} must be an array.`, value));
+        errors.push(error("schema_error", path, `${label} must be an array.`, value, context));
         return undefined;
     }
     return value;
 }
-function requireString(value, path, errors) {
+function requireString(value, path, errors, context) {
     if (typeof value !== "string" || value.length === 0) {
-        errors.push(error("schema_error", path, "value must be a non-empty string.", value));
+        errors.push(error("schema_error", path, "value must be a non-empty string.", value, context));
     }
 }
 function fail(type, path, message, value) {
     return { ok: false, errors: [error(type, path, message, value)] };
 }
-function error(type, path, message, value) {
-    return { type, path, message, value };
+function error(type, path, message, value, context) {
+    return context === undefined ? { type, path, message, value } : { type, path, message, value, context };
 }
 function isRecord(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function contextPart(kind, value) {
+    return typeof value === "string" && value.length > 0 ? `${kind} ${value}` : undefined;
+}
+function joinContext(...parts) {
+    const definedParts = parts.filter((part) => part !== undefined);
+    return definedParts.length > 0 ? definedParts.join(" > ") : undefined;
 }

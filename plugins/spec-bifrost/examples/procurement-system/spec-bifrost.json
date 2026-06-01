@@ -105,12 +105,29 @@
                 { "id": "amount", "label": "申请金额", "type": "currency", "required": true, "validationRules": ["金额必须大于 0"] },
                 { "id": "lineItemCount", "label": "采购明细数量", "type": "number", "required": true, "validationRules": ["明细数量至少为 1"] },
                 { "id": "expectedArrivalDate", "label": "期望到货日期", "type": "date", "validationRules": ["期望到货日期不能早于提交日期"] },
-                { "id": "supplierLevel", "label": "供应商等级", "type": "select", "optionSetId": "supplierLevel" },
-                { "id": "attachment", "label": "附件", "type": "file", "displayRules": ["软件服务采购需上传报价单；固定资产采购需上传预算说明附件"] },
+                { "id": "supplierLevel", "label": "供应商等级", "type": "select", "optionSetId": "supplierLevel", "enabledWhen": { "fieldId": "purchaseType", "operator": "notEmpty" }, "notes": ["先选择采购类型后再确认供应商等级。"] },
+                {
+                  "id": "attachment",
+                  "label": "附件",
+                  "type": "file",
+                  "requiredWhen": {
+                    "any": [
+                      { "fieldId": "purchaseType", "operator": "equals", "value": "software" },
+                      {
+                        "all": [
+                          { "fieldId": "purchaseType", "operator": "equals", "value": "fixed_asset" },
+                          { "fieldId": "amount", "operator": "greaterThan", "value": 10000 }
+                        ]
+                      }
+                    ]
+                  },
+                  "displayRules": ["软件服务采购需上传报价单；固定资产采购金额超过 10000 时需上传预算说明附件"]
+                },
                 { "id": "budgetNote", "label": "预算说明", "type": "textarea", "requiredWhen": { "fieldId": "amount", "operator": "greaterThan", "value": 50000 }, "notes": ["金额超过 50000 时，预算说明是审批关注点。"] },
                 { "id": "assetUsage", "label": "资产用途", "type": "textarea", "visibleWhen": { "fieldId": "purchaseType", "operator": "equals", "value": "fixed_asset" } }
               ],
               "actions": [
+                { "id": "saveDraft", "type": "showMessage", "label": "保存草稿", "message": "草稿已保存到本地原型状态", "notes": ["MVP 只表达交互反馈，不持久化真实数据。"] },
                 { "id": "submitNormal", "type": "submitPrototype", "label": "提交普通审批", "targetPageId": "purchase-detail", "actionWhen": { "fieldId": "amount", "operator": "lessThanOrEqual", "value": 50000 }, "message": "已提交普通审批", "notes": ["提交后申请人不能修改明细，只能撤回后重新编辑。"] },
                 { "id": "submitHighAmount", "type": "submitPrototype", "label": "提交大额审批", "targetPageId": "approval-workbench", "actionWhen": { "fieldId": "amount", "operator": "greaterThan", "value": 50000 }, "message": "已进入大额审批路径", "notes": ["超过 50000 的申请需要补充预算说明后进入大额审批。"] }
               ]
@@ -154,6 +171,11 @@
               "id": "approvalSteps",
               "type": "steps",
               "notes": ["审批步骤只表达业务状态，不模拟真实审批流。"],
+              "items": [
+                { "title": "申请人提交", "description": "申请人提交采购申请，系统记录提交时间。" },
+                { "title": "直属审批", "description": "审批人确认采购必要性和预算合理性。" },
+                { "title": "采购处理", "description": "采购专员确认供应商和采购执行信息。" }
+              ],
               "emptyState": { "title": "暂无审批记录" }
             }
           ]
@@ -211,6 +233,11 @@
             {
               "id": "supplierList",
               "type": "cardList",
+              "items": [
+                { "title": "优选供应商", "description": "可优先用于常规办公用品和低风险软件服务采购。", "status": "推荐" },
+                { "title": "合格供应商", "description": "可用于标准采购场景，大额采购需补充比价说明。", "status": "可选" },
+                { "title": "临时供应商", "description": "仅用于特殊或一次性采购，审批人需要重点确认原因。", "status": "需说明" }
+              ],
               "notes": ["本页只做参考展示，不提供供应商维护能力。"]
             }
           ]

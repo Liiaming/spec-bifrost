@@ -12,9 +12,10 @@ test("procurement example covers MVP schema capabilities", async () => {
       sections: Array<{
         components: Array<{
           type: string;
-          fields?: Array<{ type: string; visibleWhen?: unknown; requiredWhen?: unknown }>;
-          columns?: Array<{ type: string; visibleWhen?: unknown; requiredWhen?: unknown }>;
-          actions?: Array<{ actionWhen?: unknown; targetPageId?: string }>;
+          fields?: Array<{ type: string; visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown }>;
+          columns?: Array<{ type: string; visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown }>;
+          actions?: Array<{ type: string; actionWhen?: unknown; targetPageId?: string }>;
+          items?: unknown[];
         }>;
       }>;
     }>;
@@ -38,6 +39,21 @@ test("procurement example covers MVP schema capabilities", async () => {
   assert.equal(components.some((component) => component.type === "table"), true);
   assert.equal(components.some((component) => component.type === "steps"), true);
   assert.equal(components.some((component) => [...(component.fields ?? []), ...(component.columns ?? [])].some((field) => field.visibleWhen)), true);
+  assert.equal(components.some((component) => [...(component.fields ?? []), ...(component.columns ?? [])].some((field) => field.enabledWhen)), true);
   assert.equal(components.some((component) => [...(component.fields ?? []), ...(component.columns ?? [])].some((field) => field.requiredWhen)), true);
   assert.equal(components.some((component) => component.actions?.some((action) => action.actionWhen && action.targetPageId)), true);
+  assert.equal(components.some((component) => component.actions?.some((action) => action.type === "showMessage")), true);
+  assert.equal(
+    components.some((component) => [...(component.fields ?? []), ...(component.actions ?? [])].some((item) => hasGroupedCondition(item))),
+    true
+  );
+  assert.equal(components.some((component) => component.type === "cardList" && (component.items?.length ?? 0) >= 2), true);
 });
+
+function hasGroupedCondition(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const record = value as { visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown; actionWhen?: unknown };
+  return [record.visibleWhen, record.enabledWhen, record.requiredWhen, record.actionWhen].some((condition) => {
+    return Boolean(condition && typeof condition === "object" && (Array.isArray((condition as { all?: unknown }).all) || Array.isArray((condition as { any?: unknown }).any)));
+  });
+}

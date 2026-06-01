@@ -3,6 +3,7 @@ export interface SpecDiagnostic {
     path: string;
     type: DiagnosticType;
     message: string;
+    context?: string;
     value?: unknown;
 }
 export interface ValidationResult {

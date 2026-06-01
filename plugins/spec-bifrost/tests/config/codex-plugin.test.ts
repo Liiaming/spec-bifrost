@@ -111,3 +111,16 @@ test("stop skill documents manual preview port cleanup", async () => {
   assert.match(text, /lsof/);
   assert.match(text, /kill/);
 });
+
+test("export skill defines role-specific document structure and boundaries", async () => {
+  const skillPath = "plugins/spec-bifrost/skills/export/SKILL.md";
+  const text = await readFile(skillPath, "utf8");
+
+  assert.match(text, /前端版/);
+  assert.match(text, /后端版/);
+  assert.match(text, /页面清单/);
+  assert.match(text, /字段与交互规则/);
+  assert.match(text, /业务规则/);
+  assert.match(text, /不要把后端版写成接口定义/);
+  assert.match(text, /不要把前端版写成实现方案/);
+});
