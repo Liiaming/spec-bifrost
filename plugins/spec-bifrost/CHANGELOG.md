@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.1.1
+
+- 增强校验诊断输出，补充页面、组件、字段和动作的上下文定位。
+- 丰富采购申请管理系统示例，覆盖条件规则、操作反馈、步骤列表和供应商卡片。
+- 优化导出 skill 说明，明确前端版和后端版需求文档的结构与边界。
+- Improved validation diagnostics with page, component, field, and action context.
+- Expanded the procurement request management example with conditions, action feedback, step lists, and supplier cards.
+- Refined the export skill guidance for frontend and backend requirement document structure and boundaries.
+
 ## 0.1.0
 
 - 发布初始 MVP 插件结构，支持 Claude Code 和 OpenAI Codex marketplace 安装。
