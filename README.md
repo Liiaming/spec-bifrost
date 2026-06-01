@@ -95,6 +95,46 @@ codex plugin add spec-bifrost@spec-bifrost-marketplace
 
 发布版本需要包含 `plugins/spec-bifrost/dist`，这样 marketplace 安装后的 `spec-bifrost` CLI 可以直接运行。发布前请先运行 `npm run build`，并把生成的 `plugins/spec-bifrost/dist` 一起提交。
 
+## 5 分钟上手
+
+在一个需要沉淀产品原型的新项目目录中启动 Claude Code 或 Codex，然后直接让插件创建第一版 JSON：
+
+```txt
+/spec-bifrost:spec
+创建一个采购申请管理系统，包含申请单列表、创建申请、审批详情和基础审批流程。
+```
+
+生成或修改完成后，校验当前项目中的 `spec-bifrost.json`：
+
+```txt
+/spec-bifrost:validate
+```
+
+启动本地预览：
+
+```txt
+/spec-bifrost:preview
+```
+
+默认预览地址是 `http://127.0.0.1:3737`。如果端口没有释放，可以运行：
+
+```txt
+/spec-bifrost:stop
+```
+
+产品确认后导出两份需求文档：
+
+```txt
+/spec-bifrost:export
+```
+
+导出结果默认写入：
+
+```txt
+docs/spec-bifrost/frontend-requirements.md
+docs/spec-bifrost/backend-requirements.md
+```
+
 ## 本地开发测试安装
 
 克隆仓库并构建插件：

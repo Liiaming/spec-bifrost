@@ -95,6 +95,46 @@ In Codex Desktop, after the same marketplace is registered, the plugin uses `.co
 
 Published versions must include `plugins/spec-bifrost/dist` so the installed `spec-bifrost` CLI can run directly after marketplace install. Before publishing, run `npm run build` and commit the generated `plugins/spec-bifrost/dist` files.
 
+## 5-Minute Quick Start
+
+Start Claude Code or Codex in a new project directory where you want to capture a product prototype, then ask the plugin to create the first JSON draft:
+
+```txt
+/spec-bifrost:spec
+Create a procurement request management system with a request list, request creation, approval detail, and a basic approval flow.
+```
+
+After the JSON is generated or edited, validate the current project's `spec-bifrost.json`:
+
+```txt
+/spec-bifrost:validate
+```
+
+Start the local preview:
+
+```txt
+/spec-bifrost:preview
+```
+
+The default preview URL is `http://127.0.0.1:3737`. If the port is still occupied, run:
+
+```txt
+/spec-bifrost:stop
+```
+
+After product confirmation, export the two requirement documents:
+
+```txt
+/spec-bifrost:export
+```
+
+The exported files are expected at:
+
+```txt
+docs/spec-bifrost/frontend-requirements.md
+docs/spec-bifrost/backend-requirements.md
+```
+
 ## Install for Local Development Testing
 
 Clone the repository and build the plugin:

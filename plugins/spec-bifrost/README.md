@@ -63,6 +63,32 @@ codex plugin add spec-bifrost@spec-bifrost-marketplace
 
 Published versions must include `dist` so the CLI can run immediately after install.
 
+## 5 分钟上手 / 5-Minute Quick Start
+
+```txt
+/spec-bifrost:spec
+创建一个采购申请管理系统，包含申请单列表、创建申请、审批详情和基础审批流程。
+```
+
+```txt
+/spec-bifrost:validate
+/spec-bifrost:preview
+/spec-bifrost:export
+```
+
+默认预览地址是 `http://127.0.0.1:3737`。如果端口没有释放，运行 `/spec-bifrost:stop`。
+
+The default preview URL is `http://127.0.0.1:3737`. If the port is still occupied, run `/spec-bifrost:stop`.
+
+导出文档默认写入：
+
+Exported documents are expected at:
+
+```txt
+docs/spec-bifrost/frontend-requirements.md
+docs/spec-bifrost/backend-requirements.md
+```
+
 ## 本地安装 / Local Install
 
 ```bash
