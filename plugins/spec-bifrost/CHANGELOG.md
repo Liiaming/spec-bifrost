@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.1.4
+
+- 优化 README 首屏叙事，强化面向产品经理、独立开发者和小团队的开源定位。
+- 增加真实预览截图、工作流流程图、ROADMAP、FUNDING 和 GitHub 协作模板。
+- 补充 token 成本优势说明，强调结构化 JSON 中间层相比“AI 生成原型再转换”的 token-efficient 工作流。
+- Improved the README first screen for product managers, indie developers, small teams, and open source adoption.
+- Added a real preview screenshot, workflow diagrams, ROADMAP, FUNDING, and GitHub collaboration templates.
+- Added token-efficiency positioning for the structured JSON middle layer compared with prototype-generation-and-conversion workflows.
+
 ## 0.1.3
 
 - 修正 Codex 插件清单版本未随发布版本同步的问题。
