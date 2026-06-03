@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.1.2
+
+- 完善导出 skill 输出规范，固定前端版和后端版需求文档的推荐章节结构。
+- 基于现有采购申请管理系统示例补充前端版和后端版导出样例。
+- 同步更新中文、英文和插件 README 的导出步骤、文档边界与示例路径。
+- Refined export skill guidance with stable recommended sections for frontend and backend requirement documents.
+- Added frontend and backend export samples based on the existing procurement request management example.
+- Updated Chinese, English, and plugin README export steps, document boundaries, and sample paths.
+
 ## 0.1.1
 
 - 增强校验诊断输出，补充页面、组件、字段和动作的上下文定位。
