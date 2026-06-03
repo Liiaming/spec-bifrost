@@ -98,6 +98,13 @@ test(core): 覆盖条件跳转引用校验
 - renderer 可见变化需要附截图或短录屏。
 - 影响安装、hook、预览、导出约束的改动要在 PR 中明确说明。
 
+## Release & Documentation Sync
+- 发布版本时必须同步更新根 `package.json`、`package-lock.json`、`plugins/spec-bifrost/.claude-plugin/plugin.json` 和 `plugins/spec-bifrost/.codex-plugin/plugin.json` 的版本号。
+- 发布版本时必须确保测试覆盖版本一致性，防止 Claude manifest、Codex manifest 和根 package 版本漂移。
+- 发布版本时必须更新 `plugins/spec-bifrost/CHANGELOG.md`，并保持中英双语说明。
+- 用户可见 README 内容发生变化时，必须同步检查并更新 `README.md`、`README.en.md` 和 `plugins/spec-bifrost/README.md`。
+- Quick start、安装说明、导出说明、示例路径或产品边界变化时，中英文 README 与插件 README 必须表达同一事实。
+
 ## Security & Configuration Tips
 - 预览服务默认绑定 `127.0.0.1`，除非任务明确要求不要改成公网地址。
 - 不上传用户原型数据；MVP 假设 `spec-bifrost.json` 是本地资产。

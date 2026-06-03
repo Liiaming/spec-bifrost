@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.1.3
+
+- 修正 Codex 插件清单版本未随发布版本同步的问题。
+- 新增版本一致性测试，确保根 package、Claude manifest 和 Codex manifest 版本一致。
+- 在 AGENTS.md 中记录版本发布和 README 中英文同步规则，避免发布元数据再次漂移。
+- Fixed the Codex plugin manifest version not being synchronized with release versions.
+- Added a version consistency test for the root package, Claude manifest, and Codex manifest.
+- Documented release version and README language sync rules in AGENTS.md to prevent metadata drift.
+
 ## 0.1.2
 
 - 完善导出 skill 输出规范，固定前端版和后端版需求文档的推荐章节结构。

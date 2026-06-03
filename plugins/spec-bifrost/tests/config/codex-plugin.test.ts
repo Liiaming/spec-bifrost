@@ -38,6 +38,19 @@ test("Codex plugin manifest exposes skills and desktop interface metadata", asyn
   await access(join("plugins/spec-bifrost", String(manifest.skills), "spec", "SKILL.md"));
 });
 
+test("package and plugin manifest versions stay in sync", async () => {
+  const packageJson = await readJson("package.json");
+  const claudeManifest = await readJson("plugins/spec-bifrost/.claude-plugin/plugin.json");
+  const codexManifest = await readJson("plugins/spec-bifrost/.codex-plugin/plugin.json");
+
+  assertRecord(packageJson, "package.json");
+  assertRecord(claudeManifest, "plugins/spec-bifrost/.claude-plugin/plugin.json");
+  assertRecord(codexManifest, "plugins/spec-bifrost/.codex-plugin/plugin.json");
+
+  assert.equal(claudeManifest.version, packageJson.version);
+  assert.equal(codexManifest.version, packageJson.version);
+});
+
 test("Codex marketplace catalog points at the Spec Bifrost plugin", async () => {
   const marketplacePath = ".agents/plugins/marketplace.json";
   const marketplace = await readJson(marketplacePath);
