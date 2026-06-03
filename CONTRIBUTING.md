@@ -43,12 +43,16 @@ claude plugin validate .
 - 保持 PR 小而聚焦。
 - 行为变化需要新增或更新测试。
 - renderer 可见变化需要附截图或说明人工预览结果。
+- README、安装说明、导出说明或示例路径变化时，需要同步中文、英文和插件 README。
+- 发布元数据变化时，需要保持根 package、Claude manifest 和 Codex manifest 版本一致。
 - 提交信息遵循 Conventional Commits。
 - 不提交 secrets、私有 Claude 配置或真实客户原型数据。
 
 - Keep pull requests small and focused.
 - Add or update tests for behavior changes.
 - Include screenshots or manual preview notes for visible renderer changes.
+- Keep Chinese, English, and plugin README files in sync when changing README content, install instructions, export instructions, or example paths.
+- Keep the root package, Claude manifest, and Codex manifest versions in sync when changing release metadata.
 - Use Conventional Commits.
 - Do not commit secrets, private Claude configuration, or real customer prototype data.
 
@@ -77,3 +81,13 @@ When reporting a bug, please include:
 - Expected and actual behavior.
 - Relevant `spec-bifrost.json` snippets with sensitive business data removed.
 - Commands run and their output.
+
+## 商业化边界 / Commercial boundary
+
+Spec Bifrost 是开源项目。当前开源仓库会继续聚焦本地 JSON、预览、校验、导出和插件工作流。
+
+Spec Bifrost is an open source project. This repository will keep focusing on local JSON, preview, validation, export, and plugin workflows.
+
+未来可能出现的商业化方向应围绕托管服务、团队协作、模板市场、企业支持或定制服务展开，不应把现有开源核心能力突然移出仓库。
+
+Future commercial work may focus on hosted services, team collaboration, template marketplaces, enterprise support, or custom services. It should not abruptly remove existing open source core capabilities from this repository.

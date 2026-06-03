@@ -2,9 +2,37 @@
 
 [English](README.en.md)
 
-Spec Bifrost 是一个 Claude Code 和 OpenAI Codex 插件，用于把产品经理的自然语言需求沉淀为本地 `spec-bifrost.json`，基于该 JSON 实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
+面向产品经理、独立开发者和小团队的 AI 需求协作插件：把聊天里的产品想法沉淀为本地 `spec-bifrost.json`，实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
 
-> 状态：MVP。当前重点是验证“聊天 + 本地 JSON + 实时原型 + 角色裁剪需求文档”的工作流。
+Spec Bifrost 不是又一个“让 AI 直接写一篇需求文档”的提示词集合。它把需求先落到一个可校验、可预览、可迭代的 JSON 中间层，再让 AI 基于这个结构化上下文继续修改、预览和导出。
+
+> 状态：MVP。当前目标是把“聊天 + 本地 JSON + 实时原型 + 角色裁剪需求文档”做成可信、可演示、可参与的开源工作流。
+
+![Spec Bifrost preview](docs/assets/spec-bifrost-preview.png)
+
+## 适合谁
+
+- 面向产品经理：用自然语言快速形成可预览的 B 端原型和需求说明。
+- 面向独立开发者：把零散想法整理成工程师能读的前后端需求文档。
+- 面向小团队：在 Claude Code 或 Codex 中围绕同一份本地 JSON 做 AI 需求协作。
+- 面向开源贡献者：参与一个聚焦“AI 如何稳定表达产品需求”的早期开源项目。
+
+## 为什么不是直接让 AI 写需求文档
+
+直接让 AI 写文档很快，但每次对话都可能漂移：页面、字段、备注、交互规则和导出侧重点容易不一致。
+
+Spec Bifrost 的核心选择是加一个本地 `spec-bifrost.json` 中间层：
+
+- JSON 可校验：语法、schema 和引用错误会被明确指出。
+- JSON 可预览：用户可以先看原型，再决定需求是否正确。
+- JSON 可导出：同一份结构化需求可以裁剪成前端版和后端版文档。
+- JSON 可追踪：它是本地项目资产，可以进 Git，可以审阅，可以逐步演进。
+
+## Token 成本优势
+
+在 token 成本敏感或预算收紧时，Spec Bifrost 的工作流通常更省 token：产品不需要先让 AI 生成一整套高保真原型，再让开发把原型转换为代码或需求说明。团队围绕一份紧凑的 `spec-bifrost.json` 迭代，预览和导出都复用这份结构化上下文。
+
+这意味着 AI 不必反复读取大段截图描述、页面 HTML、设计稿说明或一次性长文档；它只需要修改可校验的 JSON，再由插件预览和导出。对于频繁修改页面、字段、流程和备注的早期产品阶段，这条路径更适合控制 token 成本。
 
 ## 为什么
 
@@ -16,6 +44,17 @@ Spec Bifrost 试图验证一条更轻量的链路：
 2. Claude Code 或 Codex 创建和修改本地 `spec-bifrost.json`。
 3. 插件校验 JSON，并提供本地预览服务。
 4. 产品确认后，Claude Code 或 Codex 基于 JSON 导出前端关注版和后端关注版需求文档。
+
+```mermaid
+flowchart LR
+  A["产品想法 / Chat"] --> B["spec-bifrost.json"]
+  B --> C["validate"]
+  C --> D["preview"]
+  D --> E["产品确认"]
+  E --> F["export"]
+  F --> G["frontend-requirements.md"]
+  F --> H["backend-requirements.md"]
+```
 
 ## 能做什么
 

@@ -50,6 +50,19 @@ body:
         Commit:
     validations:
       required: false
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Validation already tried
+      options:
+        - label: "`/spec-bifrost:validate`"
+          required: false
+        - label: "`spec-bifrost validate --cwd <project>`"
+          required: false
+        - label: "Restarted Claude Code or Codex after plugin update"
+          required: false
+        - label: "Checked whether port 3737 is still occupied"
+          required: false
   - type: textarea
     id: spec
     attributes:

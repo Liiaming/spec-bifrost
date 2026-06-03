@@ -161,3 +161,71 @@ test("README files document export steps, outputs, and boundaries", async () => 
     assert.match(text, /数据库|database/);
   }
 });
+
+test("public README presents the project for external users", async () => {
+  const readmePath = "README.md";
+  const text = await readFile(readmePath, "utf8");
+
+  assert.match(text, /面向产品经理/);
+  assert.match(text, /AI 需求协作/);
+  assert.match(text, /为什么不是直接让 AI 写需求文档/);
+  assert.match(text, /更省 token/);
+  assert.match(text, /token 成本/);
+  assert.match(text, /原型转换为代码/);
+  assert.match(text, /!\[Spec Bifrost preview\]\(docs\/assets\/spec-bifrost-preview\.png\)/);
+  assert.match(text, /```mermaid/);
+  assert.match(text, /spec-bifrost\.json/);
+  assert.match(text, /preview/);
+  assert.match(text, /export/);
+  await access("docs/assets/spec-bifrost-preview.png");
+});
+
+test("English README mirrors the external user positioning", async () => {
+  const readmePath = "README.en.md";
+  const text = await readFile(readmePath, "utf8");
+
+  assert.match(text, /for product managers/);
+  assert.match(text, /AI requirement collaboration/);
+  assert.match(text, /Why not just ask AI to write requirements directly/);
+  assert.match(text, /token-efficient/);
+  assert.match(text, /token budget/);
+  assert.match(text, /prototype-to-code/);
+  assert.match(text, /!\[Spec Bifrost preview\]\(docs\/assets\/spec-bifrost-preview\.png\)/);
+  assert.match(text, /```mermaid/);
+  assert.match(text, /spec-bifrost\.json/);
+  assert.match(text, /preview/);
+  assert.match(text, /export/);
+});
+
+test("plugin README mirrors token-efficient positioning", async () => {
+  const readmePath = "plugins/spec-bifrost/README.md";
+  const text = await readFile(readmePath, "utf8");
+
+  assert.match(text, /更省 token/);
+  assert.match(text, /token-efficient/);
+  assert.match(text, /token 成本|token budget/);
+});
+
+test("open source collaboration files are present", async () => {
+  const requiredFiles = [
+    "CONTRIBUTING.md",
+    "ROADMAP.md",
+    ".github/FUNDING.yml",
+    ".github/ISSUE_TEMPLATE/bug_report.yml",
+    ".github/ISSUE_TEMPLATE/feature_request.yml",
+    ".github/ISSUE_TEMPLATE/config.yml",
+    ".github/PULL_REQUEST_TEMPLATE.md"
+  ];
+
+  for (const filePath of requiredFiles) {
+    await access(filePath);
+  }
+
+  const contributing = await readFile("CONTRIBUTING.md", "utf8");
+  assert.match(contributing, /商业化边界/);
+  assert.match(contributing, /Commercial boundary/);
+
+  const roadmap = await readFile("ROADMAP.md", "utf8");
+  assert.match(roadmap, /Adoption/);
+  assert.match(roadmap, /商业化/);
+});

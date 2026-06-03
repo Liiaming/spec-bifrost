@@ -1,1 +1,5 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Roadmap
+    url: https://github.com/Liiaming/spec-bifrost/blob/main/ROADMAP.md
+    about: Check planned work before opening a larger feature request.

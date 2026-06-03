@@ -1,8 +1,30 @@
 # Spec Bifrost
 
-Spec Bifrost 是一个 Claude Code 和 OpenAI Codex 插件，用于基于本地 `spec-bifrost.json` 创建页面驱动的 B 端需求原型。
+Spec Bifrost 是一个面向产品经理、独立开发者和小团队的 Claude Code / OpenAI Codex 插件，用于把 AI 需求协作沉淀为本地 `spec-bifrost.json`，预览页面驱动的 B 端需求原型，并导出前端版和后端版需求文档。
 
-Spec Bifrost is a Claude Code and OpenAI Codex plugin for creating page-driven B-end requirement prototypes from a local `spec-bifrost.json` file.
+Spec Bifrost is a Claude Code / OpenAI Codex plugin for product managers, indie developers, and small teams. It turns AI requirement collaboration into a local `spec-bifrost.json`, previews page-driven business-facing prototypes, and exports frontend and backend requirement documents.
+
+![Spec Bifrost preview](../../docs/assets/spec-bifrost-preview.png)
+
+## 为什么不是直接让 AI 写需求文档 / Why not just ask AI to write requirements directly
+
+直接让 AI 写文档很快，但页面、字段、备注、交互规则和角色侧重点容易漂移。Spec Bifrost 先把需求落到可校验、可预览、可迭代的 JSON 中间层，再基于同一份结构化上下文导出文档。
+
+Direct AI-generated documents are fast, but pages, fields, notes, interaction rules, and role-specific focus can drift. Spec Bifrost first captures requirements in a validatable, previewable, and editable JSON layer, then exports documents from the same structured context.
+
+相比“产品用 AI 生成原型，再由开发用 AI 将原型转换为代码或需求说明”，Spec Bifrost 围绕紧凑的 `spec-bifrost.json` 迭代，通常更省 token，也更适合 token 成本敏感的早期产品阶段。
+
+Compared with a workflow where product uses AI to generate a prototype and developers then use AI for prototype-to-code or prototype-to-requirements conversion, Spec Bifrost iterates around a compact `spec-bifrost.json`. This is a more token-efficient fit when token budget matters during early product work.
+
+```mermaid
+flowchart LR
+  A["产品想法 / Product idea"] --> B["spec-bifrost.json"]
+  B --> C["validate"]
+  C --> D["preview"]
+  D --> E["export"]
+  E --> F["frontend-requirements.md"]
+  E --> G["backend-requirements.md"]
+```
 
 ## 能做什么 / What It Does
 

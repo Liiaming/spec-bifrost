@@ -2,9 +2,37 @@
 
 [中文](README.md)
 
-Spec Bifrost is a Claude Code and OpenAI Codex plugin that turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
+Spec Bifrost is an AI requirement collaboration plugin for product managers, indie developers, and small teams. It turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
 
-> Status: MVP. The project focuses on validating the "chat + local JSON + live prototype + role-specific requirement documents" workflow.
+Spec Bifrost is not another prompt pack that asks AI to write a requirements document directly. It puts a validated, previewable, and editable JSON layer between the conversation and the final documents, so Claude Code or Codex can keep iterating from structured context.
+
+> Status: MVP. The project is turning the "chat + local JSON + live prototype + role-specific requirement documents" workflow into something trustworthy, demonstrable, and open to contributors.
+
+![Spec Bifrost preview](docs/assets/spec-bifrost-preview.png)
+
+## Who It Is For
+
+- For product managers: turn natural language into previewable business-facing prototypes and requirement notes.
+- For indie developers: convert scattered product ideas into frontend and backend requirement documents.
+- For small teams: collaborate with AI around one local JSON artifact in Claude Code or Codex.
+- For open source contributors: help shape an early project about stable AI requirement collaboration.
+
+## Why not just ask AI to write requirements directly
+
+Direct AI-generated documents are fast, but they drift. Pages, fields, notes, interaction rules, and role-specific export focus can change from one conversation to the next.
+
+Spec Bifrost adds a local `spec-bifrost.json` middle layer:
+
+- It is validatable: syntax, schema, and reference errors are reported clearly.
+- It is previewable: users can inspect the prototype before accepting the requirement shape.
+- It is exportable: the same structured spec can produce frontend and backend documents.
+- It is traceable: the JSON is a local project asset that can be committed, reviewed, and evolved.
+
+## Token Efficiency
+
+When token budget is tight or model usage cost matters, Spec Bifrost is designed to be token-efficient. Product teams do not need to ask AI to generate a full prototype first and then ask developers to run another prototype-to-code or prototype-to-requirements pass. The team iterates around one compact `spec-bifrost.json`, and both preview and export reuse that structured context.
+
+That means AI does not need to repeatedly process large screenshot descriptions, page HTML, design handoff notes, or one-off long requirement documents. It edits validatable JSON, then the plugin handles preview and export. For early product work with frequent page, field, flow, and note changes, this is a better fit for controlling token cost.
 
 ## Why
 
@@ -16,6 +44,17 @@ Spec Bifrost explores a lighter workflow:
 2. Claude Code or Codex creates and edits the local `spec-bifrost.json`.
 3. The plugin validates the JSON and serves a local preview.
 4. After product confirmation, Claude Code or Codex exports frontend-focused and backend-focused requirement documents from the JSON.
+
+```mermaid
+flowchart LR
+  A["Product idea / Chat"] --> B["spec-bifrost.json"]
+  B --> C["validate"]
+  C --> D["preview"]
+  D --> E["Product review"]
+  E --> F["export"]
+  F --> G["frontend-requirements.md"]
+  F --> H["backend-requirements.md"]
+```
 
 ## What It Does
 

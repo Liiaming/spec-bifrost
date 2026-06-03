@@ -24,6 +24,15 @@ body:
       description: Explain why this stays within the plugin's requirement-prototype boundary.
     validations:
       required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Product boundary check
+      options:
+        - label: "This stays within requirement prototypes and requirement documents."
+          required: true
+        - label: "This does not ask Spec Bifrost to generate production code, API definitions, database designs, technical architecture, or task breakdowns."
+          required: true
   - type: textarea
     id: alternatives
     attributes:
