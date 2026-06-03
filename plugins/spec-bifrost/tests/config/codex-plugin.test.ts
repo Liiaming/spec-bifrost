@@ -116,11 +116,35 @@ test("export skill defines role-specific document structure and boundaries", asy
   const skillPath = "plugins/spec-bifrost/skills/export/SKILL.md";
   const text = await readFile(skillPath, "utf8");
 
+  assert.match(text, /输出结构/);
   assert.match(text, /前端版/);
   assert.match(text, /后端版/);
   assert.match(text, /页面清单/);
+  assert.match(text, /页面级说明/);
+  assert.match(text, /字段级说明/);
   assert.match(text, /字段与交互规则/);
+  assert.match(text, /业务对象与字段口径/);
   assert.match(text, /业务规则/);
+  assert.match(text, /导出自检/);
   assert.match(text, /不要把后端版写成接口定义/);
   assert.match(text, /不要把前端版写成实现方案/);
+});
+
+test("README files document export steps, outputs, and boundaries", async () => {
+  const readmePaths = ["README.md", "README.en.md", "plugins/spec-bifrost/README.md"];
+
+  for (const readmePath of readmePaths) {
+    const text = await readFile(readmePath, "utf8");
+    assert.match(text, /\/spec-bifrost:export/);
+    assert.match(text, /docs\/spec-bifrost\/frontend-requirements\.md/);
+    assert.match(text, /docs\/spec-bifrost\/backend-requirements\.md/);
+    assert.match(text, /前端版|frontend version/);
+    assert.match(text, /后端版|backend version/);
+    assert.match(text, /需求文档|requirement documents/);
+    assert.match(text, /页面级说明|page-level details/);
+    assert.match(text, /字段级说明|field-level rules/);
+    assert.match(text, /业务对象|business objects/);
+    assert.match(text, /接口定义|API definitions/);
+    assert.match(text, /数据库|database/);
+  }
 });

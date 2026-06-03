@@ -89,6 +89,10 @@ docs/spec-bifrost/frontend-requirements.md
 docs/spec-bifrost/backend-requirements.md
 ```
 
+前端版需求文档关注页面清单、页面流程、页面级说明、字段级说明和操作反馈；后端版需求文档关注业务对象与字段口径、业务规则、流程结果、例外与备注。两份文档都应保持需求文档属性，不包含接口定义、数据库设计、技术架构、代码结构或任务拆分。
+
+The frontend version should cover pages, flows, page-level details, field-level rules, and user-facing feedback. The backend version should cover business objects, field meanings, business rules, process outcomes, exceptions, and notes. Both documents remain requirement documents, not API definitions, database designs, architecture, code structure, or task breakdowns.
+
 ## 本地安装 / Local Install
 
 ```bash
@@ -109,3 +113,12 @@ spec-bifrost refresh --cwd "${CLAUDE_PROJECT_DIR:-$PWD}"
 使用 `examples/procurement-system/spec-bifrost.json` 试跑完整流程。
 
 Use `examples/procurement-system/spec-bifrost.json` to try the full flow.
+
+示例目录包含一组前端版和后端版导出样例：
+
+The example directory also includes frontend and backend export samples:
+
+```txt
+examples/procurement-system/docs/spec-bifrost/frontend-requirements.md
+examples/procurement-system/docs/spec-bifrost/backend-requirements.md
+```

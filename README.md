@@ -135,6 +135,10 @@ docs/spec-bifrost/frontend-requirements.md
 docs/spec-bifrost/backend-requirements.md
 ```
 
+- 前端版需求文档关注页面清单、页面流程、页面级说明、字段级说明和操作反馈。
+- 后端版需求文档关注业务对象与字段口径、业务规则、流程结果、例外与备注。
+- 两份文档都应保持需求文档属性，不包含接口定义、数据库设计、技术架构、代码结构或任务拆分。
+
 ## 本地开发测试安装
 
 克隆仓库并构建插件：
@@ -200,6 +204,8 @@ docs/spec-bifrost/frontend-requirements.md
 docs/spec-bifrost/backend-requirements.md
 ```
 
+前端版应描述用户看到什么、如何操作、字段如何展示和反馈如何出现；后端版应描述业务对象、字段口径、业务规则和流程结果。两者都不是实现方案。
+
 ## 本地 CLI
 
 构建后可以通过本地 CLI 校验和预览示例项目：
@@ -218,6 +224,13 @@ plugins/spec-bifrost/examples/procurement-system/spec-bifrost.json
 ```
 
 它覆盖 optionSets、表单、筛选、表格、详情、步骤、卡片、条件显示、条件必填、导航动作和 notes。
+
+示例目录也包含一组导出样例，可作为输出质量参考：
+
+```txt
+plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/frontend-requirements.md
+plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/backend-requirements.md
+```
 
 ## 开发
 

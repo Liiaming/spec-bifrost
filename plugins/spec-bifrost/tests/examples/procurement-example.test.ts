@@ -50,6 +50,35 @@ test("procurement example covers MVP schema capabilities", async () => {
   assert.equal(components.some((component) => component.type === "cardList" && (component.items?.length ?? 0) >= 2), true);
 });
 
+test("procurement example includes frontend and backend export samples", async () => {
+  const samplePaths = [
+    "plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/frontend-requirements.md",
+    "plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/backend-requirements.md"
+  ] as const;
+
+  for (const samplePath of samplePaths) {
+    const text = await readFile(samplePath, "utf8");
+    assert.match(text, /采购申请管理系统/);
+    assert.match(text, /申请单列表/);
+    assert.match(text, /创建申请/);
+    assert.match(text, /审批详情/);
+    assert.match(text, /供应商/);
+    assert.match(text, /不要包含接口定义、数据库设计、技术架构、代码结构或任务拆分/);
+  }
+
+  const frontendText = await readFile(samplePaths[0], "utf8");
+  assert.match(frontendText, /页面清单/);
+  assert.match(frontendText, /页面流程/);
+  assert.match(frontendText, /字段与交互规则/);
+  assert.match(frontendText, /操作反馈/);
+
+  const backendText = await readFile(samplePaths[1], "utf8");
+  assert.match(backendText, /业务对象与字段口径/);
+  assert.match(backendText, /业务规则/);
+  assert.match(backendText, /流程结果/);
+  assert.match(backendText, /例外与备注/);
+});
+
 function hasGroupedCondition(value: unknown): boolean {
   if (!value || typeof value !== "object") return false;
   const record = value as { visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown; actionWhen?: unknown };

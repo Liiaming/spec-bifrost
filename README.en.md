@@ -135,6 +135,10 @@ docs/spec-bifrost/frontend-requirements.md
 docs/spec-bifrost/backend-requirements.md
 ```
 
+- The frontend version focuses on the page list, page flow, page-level details, field-level rules, and user-facing feedback.
+- The backend version focuses on business objects, field meanings, business rules, process outcomes, exceptions, and notes.
+- Both files must remain requirement documents and must not include API definitions, database designs, technical architecture, code structure, or task breakdowns.
+
 ## Install for Local Development Testing
 
 Clone the repository and build the plugin:
@@ -200,6 +204,8 @@ docs/spec-bifrost/frontend-requirements.md
 docs/spec-bifrost/backend-requirements.md
 ```
 
+The frontend version should describe what users see, how users operate the prototype, how fields appear, and how feedback is shown. The backend version should describe business objects, field meanings, business rules, and process outcomes. Neither document is an implementation plan.
+
 ## Local CLI
 
 After build, use the local CLI to validate and preview the example project:
@@ -218,6 +224,13 @@ plugins/spec-bifrost/examples/procurement-system/spec-bifrost.json
 ```
 
 It covers option sets, forms, filters, tables, detail views, steps, cards, conditional display, conditional required fields, navigation actions, and notes.
+
+The example directory also includes export samples that can be used as output quality references:
+
+```txt
+plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/frontend-requirements.md
+plugins/spec-bifrost/examples/procurement-system/docs/spec-bifrost/backend-requirements.md
+```
 
 ## Development
 

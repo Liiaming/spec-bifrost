@@ -28,6 +28,15 @@ spec-bifrost preview --cwd "${CLAUDE_PROJECT_DIR}" --host 127.0.0.1 --port 3737
 /spec-bifrost:export
 ```
 
+本目录包含一组导出样例，可用于对照 `/spec-bifrost:export` 的输出质量：
+
+```txt
+docs/spec-bifrost/frontend-requirements.md
+docs/spec-bifrost/backend-requirements.md
+```
+
+前端版聚焦页面、流程、字段和操作反馈；后端版聚焦业务对象、字段口径、业务规则和流程结果。两份文档都仍是需求文档。
+
 ## 覆盖能力
 
 - 多页面 B 端系统。
