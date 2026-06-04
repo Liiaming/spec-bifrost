@@ -1,5 +1,18 @@
 # 更新日志 / Changelog
 
+## 0.2.0
+
+- 增强需求表达组件，新增 `metricList`、`timeline` 和 `treeList` schema 支持。
+- 为 `tabs`、`modal` 和 `drawer` 提供语义化预览渲染。
+- 支持表格批量操作保持在工具栏，避免误渲染为行内操作。
+- 丰富采购申请管理系统示例，覆盖指标、分组视图、附件抽屉、驳回确认弹窗、审批时间线、品类树和批量导出。
+- 同步更新中英文 README、插件 README、schema skill、export skill、导出样例和预览截图。
+- Added richer requirement-expression components with `metricList`, `timeline`, and `treeList` schema support.
+- Added semantic preview rendering for `tabs`, `modal`, and `drawer`.
+- Kept batch table actions in the toolbar instead of rendering them as row actions.
+- Expanded the procurement request management example with metrics, tabs, an attachment drawer, a rejection confirmation modal, an approval timeline, a category tree, and batch export.
+- Updated Chinese/English README files, plugin README, schema skill, export skill, export samples, and the preview screenshot.
+
 ## 0.1.4
 
 - 优化 README 首屏叙事，强化面向产品经理、独立开发者和小团队的开源定位。
