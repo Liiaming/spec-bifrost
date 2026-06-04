@@ -1,5 +1,16 @@
 # 更新日志 / Changelog
 
+## 0.2.1
+
+- 收敛预览页视觉风格，改为更克制、低干扰的 B 端工作台界面。
+- 去除装饰性网格背景和偏暖纸色调，降低阴影、字重和按钮动效。
+- 补充可访问焦点态、数字等宽显示和更清晰的表单占位文案。
+- 更新 README 预览截图以匹配当前渲染效果。
+- Refined the preview UI into a quieter, lower-noise B-end workspace style.
+- Removed the decorative grid background and warm paper palette, while reducing shadows, font weight, and button motion.
+- Added clearer focus states, tabular numeric rendering, and clearer form placeholder copy.
+- Updated the README preview screenshot to match the current renderer.
+
 ## 0.2.0
 
 - 增强需求表达组件，新增 `metricList`、`timeline` 和 `treeList` schema 支持。
