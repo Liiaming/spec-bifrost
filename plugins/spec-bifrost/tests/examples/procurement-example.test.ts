@@ -14,7 +14,7 @@ test("procurement example covers MVP schema capabilities", async () => {
           type: string;
           fields?: Array<{ type: string; visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown }>;
           columns?: Array<{ type: string; visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown }>;
-          actions?: Array<{ type: string; actionWhen?: unknown; targetPageId?: string }>;
+          actions?: Array<{ id: string; type: string; actionWhen?: unknown; targetPageId?: string }>;
           items?: unknown[];
         }>;
       }>;
@@ -48,6 +48,10 @@ test("procurement example covers MVP schema capabilities", async () => {
     true
   );
   assert.equal(components.some((component) => component.type === "cardList" && (component.items?.length ?? 0) >= 2), true);
+  for (const componentType of ["metricList", "tabs", "drawer", "modal", "timeline", "treeList"]) {
+    assert.equal(components.some((component) => component.type === componentType), true, `missing component type ${componentType}`);
+  }
+  assert.equal(components.some((component) => component.actions?.some((action) => /batch/i.test(action.id) || /批量/.test(action.id))), true);
 });
 
 test("procurement example includes frontend and backend export samples", async () => {
@@ -63,6 +67,9 @@ test("procurement example includes frontend and backend export samples", async (
     assert.match(text, /创建申请/);
     assert.match(text, /审批详情/);
     assert.match(text, /供应商/);
+    assert.match(text, /批量/);
+    assert.match(text, /时间线/);
+    assert.match(text, /树形|品类层级/);
     assert.match(text, /不要包含接口定义、数据库设计、技术架构、代码结构或任务拆分/);
   }
 
@@ -71,12 +78,17 @@ test("procurement example includes frontend and backend export samples", async (
   assert.match(frontendText, /页面流程/);
   assert.match(frontendText, /字段与交互规则/);
   assert.match(frontendText, /操作反馈/);
+  assert.match(frontendText, /分组视图/);
+  assert.match(frontendText, /抽屉/);
+  assert.match(frontendText, /弹窗/);
 
   const backendText = await readFile(samplePaths[1], "utf8");
   assert.match(backendText, /业务对象与字段口径/);
   assert.match(backendText, /业务规则/);
   assert.match(backendText, /流程结果/);
   assert.match(backendText, /例外与备注/);
+  assert.match(backendText, /驳回确认/);
+  assert.match(backendText, /附件抽屉/);
 });
 
 function hasGroupedCondition(value: unknown): boolean {

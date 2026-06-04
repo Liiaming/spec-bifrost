@@ -129,6 +129,12 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
       return renderDescriptionList(component, context);
     case "steps":
       return renderSteps(component);
+    case "metricList":
+      return renderMetricList(component);
+    case "timeline":
+      return renderTimeline(component);
+    case "treeList":
+      return renderTreeList(component);
     case "cardList":
       return renderCardList(component);
     case "emptyState":
@@ -136,13 +142,16 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
     case "alert":
       return renderAlert(component);
     case "actionBar":
-      return renderActionBar(component.actions);
+      return renderActionPanel(component);
+    case "tabs":
+      return renderTabs(component);
+    case "modal":
+      return renderModal(component, context);
+    case "drawer":
+      return renderDrawer(component, context);
     case "textBlock":
     case "pageHeader":
     case "section":
-    case "tabs":
-    case "modal":
-    case "drawer":
       return renderSimpleComponent(component, context);
     default:
       return renderSimpleComponent(component, context);
@@ -281,6 +290,129 @@ function renderSteps(component: ComponentSpec): string {
   `;
 }
 
+function renderMetricList(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  if (records.length === 0) return `${renderComponentTitle(component)}${renderEmptyState(component.emptyState ?? { title: "暂无指标配置" })}`;
+  return `
+    ${renderComponentTitle(component)}
+    <div class="metric-list">
+      ${records
+        .map(
+          (record) => `
+          <article class="metric-card">
+            <span>${escapeHtml(record.label ?? record.title ?? "指标")}</span>
+            <strong>${escapeHtml(record.value ?? "-")}</strong>
+            ${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}
+            ${record.trend ? `<em>${escapeHtml(record.trend)}</em>` : ""}
+          </article>
+        `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderTabs(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  if (records.length === 0) return `${renderComponentTitle(component)}${renderEmptyState(component.emptyState ?? { title: "暂无分组内容" })}`;
+  return `
+    ${renderComponentTitle(component)}
+    <div class="tabs-preview">
+      <div class="tab-buttons">
+        ${records.map((record, index) => `<button type="button" class="${index === 0 ? "active" : ""}">${escapeHtml(record.label ?? record.title ?? `分组 ${index + 1}`)}</button>`).join("")}
+      </div>
+      <div class="tab-panels">
+        ${records
+          .map(
+            (record, index) => `
+            <section ${index === 0 ? "" : "hidden"}>
+              <strong>${escapeHtml(record.title ?? record.label ?? `分组 ${index + 1}`)}</strong>
+              ${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}
+            </section>
+          `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderModal(component: ComponentSpec, context: RenderContext): string {
+  const fields = component.fields ?? [];
+  return `
+    <div class="modal-preview">
+      <div class="modal-surface">
+        ${renderComponentTitle(component)}
+        ${fields.length > 0 ? `<div class="form-grid">${fields.map((field) => renderFieldControl(field, context, "form")).join("")}</div>` : ""}
+        ${renderActionBar(component.actions)}
+        ${fields.length === 0 && !component.actions?.length ? renderEmptyState(component.emptyState ?? { title: "暂无弹窗内容" }) : ""}
+      </div>
+    </div>
+  `;
+}
+
+function renderDrawer(component: ComponentSpec, context: RenderContext): string {
+  const fields = component.fields ?? [];
+  return `
+    <aside class="drawer-preview">
+      ${renderComponentTitle(component)}
+      ${fields.length > 0 ? `<div class="form-grid drawer-grid">${fields.map((field) => renderFieldControl(field, context, "form")).join("")}</div>` : ""}
+      ${renderActionBar(component.actions)}
+      ${fields.length === 0 && !component.actions?.length ? renderEmptyState(component.emptyState ?? { title: "暂无抽屉内容" }) : ""}
+    </aside>
+  `;
+}
+
+function renderTimeline(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  if (records.length === 0) return `${renderComponentTitle(component)}${renderEmptyState(component.emptyState ?? { title: "暂无时间线记录" })}`;
+  return `
+    ${renderComponentTitle(component)}
+    <ol class="timeline-list">
+      ${records
+        .map(
+          (record) => `
+          <li>
+            <time>${escapeHtml(record.time ?? record.date ?? "")}</time>
+            <div>
+              <strong>${escapeHtml(record.title ?? record.label ?? "时间线节点")}</strong>
+              ${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}
+              ${record.status ? `<span class="status-tag">${escapeHtml(record.status)}</span>` : ""}
+            </div>
+          </li>
+        `
+        )
+        .join("")}
+    </ol>
+  `;
+}
+
+function renderTreeList(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  if (records.length === 0) return `${renderComponentTitle(component)}${renderEmptyState(component.emptyState ?? { title: "暂无层级数据" })}`;
+  return `
+    ${renderComponentTitle(component)}
+    ${renderTreeNodes(records, true)}
+  `;
+}
+
+function renderTreeNodes(records: Array<Record<string, unknown>>, isRoot = false): string {
+  return `<ul class="tree-list${isRoot ? " tree-root" : ""}">${records
+    .map((record) => {
+      const children = normalizeRecords(Array.isArray(record.children) ? record.children : undefined);
+      return `
+        <li>
+          <div class="tree-node">
+            <strong>${escapeHtml(record.title ?? record.label ?? record.name ?? "未命名节点")}</strong>
+            ${record.description ? `<span>${escapeHtml(record.description)}</span>` : ""}
+          </div>
+          ${children.length > 0 ? renderTreeNodes(children) : ""}
+        </li>
+      `;
+    })
+    .join("")}</ul>`;
+}
+
 function renderCardList(component: ComponentSpec): string {
   const records = normalizeRecords(component.items);
   if (records.length === 0) {
@@ -305,6 +437,16 @@ function renderCardList(component: ComponentSpec): string {
 
 function renderAlert(component: ComponentSpec): string {
   return `<div class="inline-alert">${renderComponentTitle(component)}${component.emptyState?.description ? escapeHtml(component.emptyState.description) : ""}</div>`;
+}
+
+function renderActionPanel(component: ComponentSpec): string {
+  return `
+    <div class="action-panel">
+      ${renderComponentTitle(component)}
+      ${renderActionBar(component.actions)}
+      ${!component.actions?.length ? renderEmptyState(component.emptyState ?? { title: "暂无操作配置" }) : ""}
+    </div>
+  `;
 }
 
 function renderSimpleComponent(component: ComponentSpec, context: RenderContext): string {
@@ -388,6 +530,7 @@ function renderActionButton(action: ActionSpec, tone: "primary" | "secondary" | 
 }
 
 function isRowAction(action: ActionSpec): boolean {
+  if (/batch|bulk/i.test(action.id) || /批量/.test(action.label)) return false;
   return /view|detail|edit|approve/i.test(action.id) || /查看|详情|编辑|处理|审批/.test(action.label);
 }
 
@@ -891,6 +1034,145 @@ td.row-actions { display: flex; gap: 10px; }
   color: var(--accent);
   font-weight: 700;
 }
+.metric-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.metric-card {
+  min-height: 132px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(32, 35, 31, 0.05);
+}
+.metric-card span { color: var(--muted); font-size: 12px; font-weight: 800; }
+.metric-card strong { display: block; margin-top: 8px; font-size: 28px; line-height: 1.1; }
+.metric-card p { margin: 8px 0 0; }
+.metric-card em { display: inline-block; margin-top: 10px; color: var(--accent-strong); font-size: 12px; font-style: normal; font-weight: 800; }
+.tabs-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tab-buttons {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-soft);
+  padding: 8px 10px 0;
+  overflow-x: auto;
+}
+.tab-buttons button {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.tab-buttons button.active {
+  background: #ffffff;
+  border-color: var(--line);
+  color: var(--accent-strong);
+}
+.tab-panels { padding: 14px; }
+.tab-panels section p { margin: 6px 0 0; }
+.modal-preview, .drawer-preview, .action-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(32, 35, 31, 0.05);
+}
+.modal-preview {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  background:
+    linear-gradient(rgba(32, 35, 31, 0.08), rgba(32, 35, 31, 0.08)),
+    rgba(255, 255, 255, 0.7);
+}
+.modal-surface {
+  width: min(620px, 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.drawer-preview {
+  width: min(560px, 100%);
+  margin-left: auto;
+  border-right: 4px solid var(--accent);
+}
+.drawer-grid { grid-template-columns: 1fr; }
+.timeline-list {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  list-style: none;
+  box-shadow: var(--shadow);
+}
+.timeline-list li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) 1fr;
+  gap: 16px;
+  padding: 12px 4px 12px 22px;
+}
+.timeline-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 19px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--coral);
+}
+.timeline-list time { color: var(--muted); font-size: 12px; font-weight: 800; }
+.timeline-list p { margin: 4px 0 0; }
+.tree-list {
+  margin: 0;
+  padding: 8px 0 8px 18px;
+  list-style: none;
+}
+.tree-root {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+.tree-list .tree-list {
+  border-left: 1px dashed var(--line-strong);
+  margin-left: 8px;
+}
+.tree-list li { padding: 5px 10px 5px 0; }
+.tree-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+.tree-node strong::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  margin-right: 8px;
+}
+.tree-node span { color: var(--muted); font-size: 12px; }
 .card-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .card-list article, .empty-state, .simple-component, .inline-alert {
   border: 1px solid var(--line);

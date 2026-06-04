@@ -75,6 +75,35 @@ test("unsupported component type fails with facts only", () => {
   assert.equal("suggestion" in (result.errors[0] as object), false);
 });
 
+test("requirement expressiveness components pass validation", () => {
+  const spec = validSpec() as unknown as Record<string, unknown>;
+  const pages = spec["pages"] as Array<Record<string, unknown>>;
+  const sections = pages[0]!["sections"] as Array<Record<string, unknown>>;
+  const components = sections[0]!["components"] as Array<Record<string, unknown>>;
+  components.push(
+    {
+      id: "approvalMetrics",
+      type: "metricList",
+      items: [{ label: "审批中", value: "12", description: "当前待处理申请" }]
+    },
+    {
+      id: "approvalTimeline",
+      type: "timeline",
+      items: [{ title: "部门负责人审批", time: "2026-06-01 10:00", description: "确认预算归属" }]
+    },
+    {
+      id: "categoryTree",
+      type: "treeList",
+      items: [{ title: "办公用品", children: [{ title: "显示器" }] }]
+    }
+  );
+
+  const result = validateSpec(spec);
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+});
+
 test("notes are allowed on page section component field and action", () => {
   const spec = validSpec();
   spec.pages[0]!.notes = ["页面备注"];

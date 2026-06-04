@@ -63,6 +63,7 @@ flowchart LR
 - 提供中保真、多页面 B 端原型预览。
 - 支持页面、section、组件、字段、动作和按钮上的 notes。
 - 支持表单、筛选、表格、详情、步骤、卡片、空状态等常见 B 端表达。
+- 支持指标、分组视图、弹窗、抽屉、时间线、树形层级、附件字段和批量操作等更复杂的需求表达。
 - 支持字段规则、条件显示、条件必填和页面跳转。
 - renderer 使用 last known good 策略，当前 JSON 渲染失败时保留上一版有效预览。
 - 指导 Claude Code 或 Codex 导出前端版和后端版 Markdown 需求文档。
@@ -262,7 +263,7 @@ npm run spec-bifrost -- preview --cwd plugins/spec-bifrost/examples/procurement-
 plugins/spec-bifrost/examples/procurement-system/spec-bifrost.json
 ```
 
-它覆盖 optionSets、表单、筛选、表格、详情、步骤、卡片、条件显示、条件必填、导航动作和 notes。
+它覆盖 optionSets、表单、筛选、表格、详情、步骤、卡片、指标、分组视图、弹窗、抽屉、时间线、树形层级、附件、批量操作、条件显示、条件必填、导航动作和 notes。
 
 示例目录也包含一组导出样例，可作为输出质量参考：
 

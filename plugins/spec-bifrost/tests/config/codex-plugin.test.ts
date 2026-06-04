@@ -139,6 +139,10 @@ test("export skill defines role-specific document structure and boundaries", asy
   assert.match(text, /业务对象与字段口径/);
   assert.match(text, /业务规则/);
   assert.match(text, /导出自检/);
+  assert.match(text, /tabs/);
+  assert.match(text, /metricList/);
+  assert.match(text, /timeline/);
+  assert.match(text, /treeList/);
   assert.match(text, /不要把后端版写成接口定义/);
   assert.match(text, /不要把前端版写成实现方案/);
 });
@@ -156,6 +160,9 @@ test("README files document export steps, outputs, and boundaries", async () => 
     assert.match(text, /需求文档|requirement documents/);
     assert.match(text, /页面级说明|page-level details/);
     assert.match(text, /字段级说明|field-level rules/);
+    assert.match(text, /tabs|分组视图/);
+    assert.match(text, /timeline|时间线/);
+    assert.match(text, /tree|树形/);
     assert.match(text, /业务对象|business objects/);
     assert.match(text, /接口定义|API definitions/);
     assert.match(text, /数据库|database/);

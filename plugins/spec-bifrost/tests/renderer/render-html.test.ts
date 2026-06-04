@@ -250,3 +250,143 @@ test("renderPrototypeHtml emits condition metadata and runtime hooks", () => {
   assert.match(html, /addEventListener\("change", applyCurrentPageConditions\)/);
   assert.match(html, /function evaluateCondition/);
 });
+
+test("renderPrototypeHtml renders requirement expressiveness components", () => {
+  const spec = {
+    schemaVersion: "1.0",
+    project: { name: "采购申请", description: "测试系统", actors: ["申请人", "审批人"] },
+    pages: [
+      {
+        id: "detail",
+        title: "采购申请详情",
+        purpose: "查看复杂采购申请",
+        route: "/detail",
+        type: "detail",
+        nav: { visible: true, label: "详情", order: 1 },
+        sections: [
+          {
+            id: "overview",
+            title: "审批概览",
+            components: [
+              {
+                id: "approvalMetrics",
+                type: "metricList",
+                title: "关键指标",
+                items: [
+                  { label: "审批中", value: "12", description: "当前待处理申请", trend: "较昨日 +3" },
+                  { label: "大额申请", value: "4", description: "超过 50000 元" }
+                ]
+              },
+              {
+                id: "detailTabs",
+                type: "tabs",
+                title: "详情分组",
+                items: [
+                  { label: "基础信息", description: "申请标题、金额、供应商信息" },
+                  { label: "审批记录", description: "节点、处理人和处理意见" }
+                ]
+              },
+              {
+                id: "attachmentDrawer",
+                type: "drawer",
+                title: "附件抽屉",
+                fields: [{ id: "contractFile", label: "合同附件", type: "file", notes: ["支持表达上传和附件归档需求。"] }],
+                actions: [{ id: "close", type: "closeDrawer", label: "关闭抽屉" }]
+              },
+              {
+                id: "rejectModal",
+                type: "modal",
+                title: "驳回确认弹窗",
+                fields: [{ id: "rejectReason", label: "驳回原因", type: "textarea", required: true }],
+                actions: [{ id: "confirmReject", type: "showMessage", label: "确认驳回", message: "已记录驳回意见" }]
+              },
+              {
+                id: "approvalTimeline",
+                type: "timeline",
+                title: "审批时间线",
+                items: [
+                  { title: "提交申请", time: "2026-06-01 09:00", description: "申请人提交采购需求" },
+                  { title: "部门负责人审批", time: "2026-06-01 10:00", description: "确认预算归属" }
+                ]
+              },
+              {
+                id: "categoryTree",
+                type: "treeList",
+                title: "采购分类树",
+                items: [
+                  {
+                    title: "办公用品",
+                    description: "行政采购",
+                    children: [{ title: "显示器" }, { title: "工位耗材" }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as SpecBifrostDocument;
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /<div class="metric-list"/);
+  assert.match(html, /<strong>12<\/strong>/);
+  assert.match(html, /<div class="tabs-preview"/);
+  assert.match(html, /<button type="button" class="active">基础信息<\/button>/);
+  assert.match(html, /<aside class="drawer-preview"/);
+  assert.match(html, /<input id="field-contractFile" type="file"/);
+  assert.match(html, /<div class="modal-preview"/);
+  assert.match(html, /驳回确认弹窗/);
+  assert.match(html, /<ol class="timeline-list"/);
+  assert.match(html, /2026-06-01 10:00/);
+  assert.match(html, /<ul class="tree-list"/);
+  assert.match(html, /显示器/);
+  assert.doesNotMatch(html, /暂无内容配置/);
+});
+
+test("renderPrototypeHtml keeps batch table actions in the toolbar", () => {
+  const spec: SpecBifrostDocument = {
+    schemaVersion: "1.0",
+    project: { name: "采购申请", description: "测试系统", actors: ["审批人"] },
+    pages: [
+      {
+        id: "approval",
+        title: "审批工作台",
+        purpose: "批量处理采购申请",
+        route: "/approval",
+        type: "approval",
+        nav: { visible: true, label: "审批", order: 1 },
+        sections: [
+          {
+            id: "table",
+            components: [
+              {
+                id: "approvalTable",
+                type: "table",
+                columns: [{ id: "requestNo", label: "申请编号", type: "text" }],
+                actions: [
+                  { id: "batchApprove", type: "showMessage", label: "批量审批", message: "已批量审批" },
+                  { id: "viewDetail", type: "navigate", label: "查看详情", targetPageId: "detail" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "detail",
+        title: "详情",
+        purpose: "查看详情",
+        route: "/detail",
+        type: "detail",
+        sections: []
+      }
+    ]
+  };
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /<div class="table-actions"><button type="button" class="primary-button" data-action-button data-action-type="showMessage" data-message="已批量审批">批量审批<\/button><\/div>/);
+  assert.match(html, /<td class="row-actions"><button type="button" class="text-button" data-action-button data-action-type="navigate" data-target-page-id="detail">查看详情<\/button><\/td>/);
+});

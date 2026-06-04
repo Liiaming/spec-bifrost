@@ -65,6 +65,9 @@ Supported component types:
 - `descriptionList`
 - `cardList`
 - `steps`
+- `metricList`
+- `timeline`
+- `treeList`
 - `tabs`
 - `alert`
 - `emptyState`
@@ -73,7 +76,18 @@ Supported component types:
 - `actionBar`
 - `textBlock`
 
-Do not use unsupported components such as chart, tree, calendar, transfer, tour, carousel, rate, colorPicker, qrCode, or watermark in the MVP.
+Use these components for richer B-end requirement expression:
+
+- `metricList`: overview numbers, status counts, backlog counts, amount summaries, and dashboard-like facts.
+- `tabs`: page-level grouping such as basic information, details, records, attachments, and logs.
+- `modal`: confirmations or small focused forms such as rejection confirmation.
+- `drawer`: side panels for detail, attachment, or contextual follow-up content.
+- `timeline`: chronological business events, approval records, operation logs, and status history.
+- `treeList`: hierarchical categories, departments, permission scopes, and procurement category trees.
+- `table` toolbar actions can express batch operations when action labels or ids indicate batch behavior.
+- `file` fields express upload or attachment requirements.
+
+Do not use unsupported components such as chart, calendar, transfer, tour, carousel, rate, colorPicker, qrCode, or watermark in the MVP.
 
 Component and section `title` values, when present, must be non-empty strings.
 

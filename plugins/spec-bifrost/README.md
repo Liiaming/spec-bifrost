@@ -36,6 +36,8 @@ flowchart LR
 - Starts a local preview for multi-page B-end prototypes.
 - 在预览中用临时字段值驱动条件显示、条件必填、条件禁用和条件动作跳转。
 - Uses temporary preview field values for conditional display, required state, disabled state, and action navigation.
+- 支持指标、分组视图、弹窗、抽屉、时间线、树形层级、附件字段和批量操作等更复杂的需求表达。
+- Supports more complex requirement expression through metrics, tabs, modals, drawers, timelines, tree structures, file fields, and batch actions.
 - 当前 JSON 无法渲染时，保留上一版有效预览。
 - Keeps last known good preview output when the current JSON cannot render.
 - 指导 Claude Code 或 Codex 导出前端和后端 Markdown 需求文档。

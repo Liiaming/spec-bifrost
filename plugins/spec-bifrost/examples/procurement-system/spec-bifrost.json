@@ -65,6 +65,17 @@
           "title": "申请列表",
           "components": [
             {
+              "id": "listMetrics",
+              "type": "metricList",
+              "title": "待处理概览",
+              "items": [
+                { "label": "审批中", "value": "12", "description": "当前仍在审批链路中的采购申请", "trend": "较昨日 +3" },
+                { "label": "大额申请", "value": "4", "description": "申请金额超过 50000 的重点关注项" },
+                { "label": "待补附件", "value": "6", "description": "软件服务或固定资产采购缺少必要附件" }
+              ],
+              "notes": ["指标用于表达审批人和采购专员进入列表前需要快速掌握的业务状态。"]
+            },
+            {
               "id": "purchaseTable",
               "type": "table",
               "columns": [
@@ -75,6 +86,7 @@
               ],
               "actions": [
                 { "id": "create", "type": "navigate", "label": "新建申请", "targetPageId": "purchase-edit", "notes": ["申请人从这里发起新的采购申请。"] },
+                { "id": "batchExport", "type": "showMessage", "label": "批量导出", "message": "已生成选中申请的导出任务", "notes": ["批量操作作用于勾选的申请，不是单行操作。"] },
                 { "id": "view", "type": "navigate", "label": "查看详情", "targetPageId": "purchase-detail" }
               ]
             }
@@ -157,6 +169,18 @@
               ]
             },
             {
+              "id": "detailTabs",
+              "type": "tabs",
+              "title": "详情分组",
+              "items": [
+                { "label": "基础信息", "description": "展示申请标题、金额、采购类型、供应商等级和申请部门。" },
+                { "label": "采购明细", "description": "展示多条采购物品、数量、单价和品类标签。" },
+                { "label": "审批记录", "description": "展示审批节点、处理人、处理时间和处理意见。" },
+                { "label": "附件", "description": "展示报价单、预算说明、合同或验收材料。" }
+              ],
+              "notes": ["详情页用分组表达不同角色关注的信息，不要求真实 tab 交互持久化。"]
+            },
+            {
               "id": "purchaseItems",
               "type": "table",
               "columns": [
@@ -168,6 +192,17 @@
               "notes": ["采购明细用于研发理解一条申请中可能包含多个采购项。"]
             },
             {
+              "id": "attachmentDrawer",
+              "type": "drawer",
+              "title": "附件查看抽屉",
+              "fields": [
+                { "id": "contractAttachment", "label": "合同或报价单附件", "type": "file", "notes": ["附件抽屉用于表达查看和补充材料的需求，不上传真实文件。"] }
+              ],
+              "actions": [
+                { "id": "closeAttachmentDrawer", "type": "closeDrawer", "label": "关闭抽屉" }
+              ]
+            },
+            {
               "id": "approvalSteps",
               "type": "steps",
               "notes": ["审批步骤只表达业务状态，不模拟真实审批流。"],
@@ -177,6 +212,17 @@
                 { "title": "采购处理", "description": "采购专员确认供应商和采购执行信息。" }
               ],
               "emptyState": { "title": "暂无审批记录" }
+            },
+            {
+              "id": "approvalTimeline",
+              "type": "timeline",
+              "title": "审批时间线",
+              "items": [
+                { "title": "提交申请", "time": "2026-06-01 09:00", "description": "申请人提交采购申请，系统记录提交时间。", "status": "已完成" },
+                { "title": "部门负责人审批", "time": "2026-06-01 10:20", "description": "确认采购必要性和预算归属。", "status": "已完成" },
+                { "title": "采购专员处理", "time": "2026-06-01 14:00", "description": "确认供应商、报价材料和采购执行口径。", "status": "待处理" }
+              ],
+              "notes": ["时间线用于表达业务过程中的处理顺序和时间口径。"]
             }
           ]
         }
@@ -213,6 +259,18 @@
               "actions": [
                 { "id": "confirmApproval", "type": "submitPrototype", "label": "提交审批结果" }
               ]
+            },
+            {
+              "id": "rejectConfirmModal",
+              "type": "modal",
+              "title": "驳回确认弹窗",
+              "fields": [
+                { "id": "rejectConfirmReason", "label": "确认驳回原因", "type": "textarea", "required": true, "notes": ["审批人驳回时必须确认原因，便于申请人修改后重新提交。"] }
+              ],
+              "actions": [
+                { "id": "cancelReject", "type": "closeModal", "label": "取消" },
+                { "id": "submitReject", "type": "showMessage", "label": "确认驳回", "message": "已记录驳回意见" }
+              ]
             }
           ]
         }
@@ -239,6 +297,38 @@
                 { "title": "临时供应商", "description": "仅用于特殊或一次性采购，审批人需要重点确认原因。", "status": "需说明" }
               ],
               "notes": ["本页只做参考展示，不提供供应商维护能力。"]
+            },
+            {
+              "id": "categoryTree",
+              "type": "treeList",
+              "title": "采购品类层级",
+              "items": [
+                {
+                  "title": "办公用品",
+                  "description": "行政部常规采购",
+                  "children": [
+                    { "title": "显示器" },
+                    { "title": "键盘鼠标" }
+                  ]
+                },
+                {
+                  "title": "软件服务",
+                  "description": "订阅、授权和技术服务",
+                  "children": [
+                    { "title": "SaaS 订阅" },
+                    { "title": "开发工具授权" }
+                  ]
+                },
+                {
+                  "title": "固定资产",
+                  "description": "超过资产入账阈值的采购",
+                  "children": [
+                    { "title": "办公设备" },
+                    { "title": "研发设备" }
+                  ]
+                }
+              ],
+              "notes": ["树形结构用于表达层级分类和选择口径，不表示后端分类模型。"]
             }
           ]
         }

@@ -89,7 +89,7 @@ export interface ConditionSpec {
     any?: ConditionSpec[];
 }
 export type PageType = "list" | "form" | "detail" | "approval" | "reference";
-export type ComponentType = "pageHeader" | "section" | "form" | "filterBar" | "table" | "descriptionList" | "cardList" | "steps" | "tabs" | "alert" | "emptyState" | "modal" | "drawer" | "actionBar" | "textBlock";
+export type ComponentType = "pageHeader" | "section" | "form" | "filterBar" | "table" | "descriptionList" | "cardList" | "steps" | "metricList" | "timeline" | "treeList" | "tabs" | "alert" | "emptyState" | "modal" | "drawer" | "actionBar" | "textBlock";
 export type FieldType = "text" | "textarea" | "number" | "currency" | "date" | "dateRange" | "time" | "select" | "multiSelect" | "radio" | "checkbox" | "switch" | "user" | "department" | "file" | "status" | "tag";
 export type ActionType = "navigate" | "openModal" | "closeModal" | "openDrawer" | "closeDrawer" | "setFieldValue" | "submitPrototype" | "resetFields" | "showMessage";
 export type ConditionOperator = "equals" | "notEquals" | "in" | "notIn" | "empty" | "notEmpty" | "greaterThan" | "greaterThanOrEqual" | "lessThan" | "lessThanOrEqual" | "contains";
