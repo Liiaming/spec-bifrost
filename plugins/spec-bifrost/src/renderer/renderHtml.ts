@@ -129,6 +129,16 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
       return renderTreeTable(component, context);
     case "comparisonTable":
       return renderComparisonTable(component, context);
+    case "kanbanBoard":
+      return renderKanbanBoard(component);
+    case "workflowDiagram":
+      return renderWorkflowDiagram(component);
+    case "wizard":
+      return renderWizard(component);
+    case "progressTracker":
+      return renderProgressTracker(component);
+    case "resultPanel":
+      return renderResultPanel(component);
     case "form":
       return renderForm(component, context);
     case "descriptionList":
@@ -452,6 +462,68 @@ function renderDrawer(component: ComponentSpec, context: RenderContext): string 
   `;
 }
 
+function renderKanbanBoard(component: ComponentSpec): string {
+  const columns = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="kanban-board">
+      ${columns
+        .map((column) => {
+          const cards = normalizeRecords(Array.isArray(column.children) ? column.children : undefined);
+          return `<section class="kanban-column"><h4>${escapeHtml(column.title ?? column.label ?? "状态")}</h4>${cards
+            .map((card) => `<article class="kanban-card"><strong>${escapeHtml(card.title ?? card.label ?? "卡片")}</strong>${card.description ? `<p>${escapeHtml(card.description)}</p>` : ""}</article>`)
+            .join("")}</section>`;
+        })
+        .join("")}
+    </div>
+    ${columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无看板数据" }) : ""}
+  `;
+}
+
+function renderWorkflowDiagram(component: ComponentSpec): string {
+  const nodes = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="workflow-diagram">
+      <div class="workflow-nodes">${nodes.map((node, index) => `<div class="workflow-node"><span>${index + 1}</span><strong>${escapeHtml(node.title ?? node.label ?? node.id ?? "节点")}</strong>${node.description ? `<p>${escapeHtml(node.description)}</p>` : ""}</div>`).join("")}</div>
+      ${renderRelationList(component)}
+    </div>
+    ${nodes.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无流程节点" }) : ""}
+  `;
+}
+
+function renderWizard(component: ComponentSpec): string {
+  const steps = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="wizard-preview">
+      <ol>${steps.map((step, index) => `<li class="${index === 0 ? "active" : ""}"><span>${index + 1}</span><strong>${escapeHtml(step.title ?? step.label ?? `步骤 ${index + 1}`)}</strong>${step.description ? `<p>${escapeHtml(step.description)}</p>` : ""}</li>`).join("")}</ol>
+    </div>
+    ${steps.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无向导步骤" }) : ""}
+  `;
+}
+
+function renderProgressTracker(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="progress-tracker">
+      ${records.map((record) => `<div class="progress-row"><div><strong>${escapeHtml(record.label ?? record.title ?? "进度")}</strong>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</div>${renderProgressBar(record.value)}</div>`).join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无进度数据" }) : ""}
+  `;
+}
+
+function renderResultPanel(component: ComponentSpec): string {
+  return `
+    <div class="result-panel">
+      ${renderComponentTitle(component)}
+      ${renderEmptyState(component.emptyState ?? { title: "处理完成" })}
+      ${renderActionBar(component.actions)}
+    </div>
+  `;
+}
+
 function renderTimeline(component: ComponentSpec): string {
   const records = normalizeRecords(component.items);
   if (records.length === 0) return `${renderComponentTitle(component)}${renderEmptyState(component.emptyState ?? { title: "暂无时间线记录" })}`;
@@ -678,6 +750,16 @@ function renderNotes(notes: string[] | undefined): string {
 function renderNotesBlock(notes: string[] | undefined, className: string): string {
   if (!notes || notes.length === 0) return "";
   return `<div class="${className}">${renderNotes(notes)}</div>`;
+}
+
+function renderRelationList(component: ComponentSpec): string {
+  if (!component.relations || component.relations.length === 0) return "";
+  return `<ol class="relation-list">${component.relations.map((relation) => `<li><span>${escapeHtml(relation.sourceId)}</span><strong>${escapeHtml(relation.label ?? relation.type ?? "关联")}</strong><span>${escapeHtml(relation.targetId)}</span>${renderNotes(relation.notes)}</li>`).join("")}</ol>`;
+}
+
+function renderProgressBar(value: unknown): string {
+  const numericValue = typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
+  return `<div class="progress-bar" aria-label="完成度 ${numericValue}%"><span style="width:${numericValue}%"></span><em>${numericValue}%</em></div>`;
 }
 
 function styles(): string {
@@ -1233,6 +1315,33 @@ td.row-actions { display: flex; gap: 10px; }
   overscroll-behavior: contain;
 }
 .drawer-grid { grid-template-columns: 1fr; }
+.kanban-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.kanban-column { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 12px; box-shadow: var(--shadow); }
+.kanban-column h4 { margin: 0 0 10px; color: #334155; font-size: 13px; }
+.kanban-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; margin-bottom: 8px; }
+.kanban-card p { margin: 4px 0 0; font-size: 12px; }
+.workflow-diagram, .wizard-preview, .progress-tracker, .result-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.workflow-nodes { display: flex; flex-wrap: wrap; gap: 10px; }
+.workflow-node { min-width: 150px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.workflow-node span, .wizard-preview li > span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+.relation-list { margin: 12px 0 0; padding-left: 20px; color: var(--muted); }
+.relation-list li { margin-top: 6px; }
+.relation-list strong { margin: 0 8px; color: #334155; }
+.wizard-preview ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.wizard-preview li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.wizard-preview li.active { border-color: rgba(37, 99, 235, 0.32); background: var(--accent-tint); }
+.progress-row { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(180px, 320px); gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.progress-row:last-child { border-bottom: 0; }
+.progress-bar { position: relative; height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.progress-bar span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.progress-bar em { position: absolute; right: 0; top: -22px; color: var(--muted); font-size: 12px; font-style: normal; }
+.result-panel { border-color: rgba(4, 120, 87, 0.22); background: var(--success-soft); }
 .timeline-list {
   margin: 0;
   padding: 12px;

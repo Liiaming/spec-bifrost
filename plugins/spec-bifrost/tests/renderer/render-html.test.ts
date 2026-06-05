@@ -412,6 +412,74 @@ test("renderPrototypeHtml renders v0.3 data table components", () => {
   assert.doesNotMatch(html, /暂无内容配置/);
 });
 
+test("renderPrototypeHtml renders v0.3 flow and state components", () => {
+  const spec = {
+    schemaVersion: "1.0",
+    project: { name: "采购流程", description: "测试系统", actors: ["审批人"] },
+    pages: [
+      {
+        id: "flow",
+        title: "流程工作台",
+        purpose: "查看流程状态",
+        route: "/flow",
+        type: "approval",
+        sections: [
+          {
+            id: "flowComponents",
+            components: [
+              {
+                id: "approvalKanban",
+                type: "kanbanBoard",
+                title: "审批看板",
+                items: [{ title: "待审批", children: [{ title: "REQ-001", description: "行政部采购" }] }]
+              },
+              {
+                id: "approvalWorkflow",
+                type: "workflowDiagram",
+                title: "审批流",
+                items: [{ id: "draft", title: "草稿" }, { id: "submitted", title: "已提交" }],
+                relations: [{ sourceId: "draft", targetId: "submitted", label: "提交" }]
+              },
+              {
+                id: "createWizard",
+                type: "wizard",
+                title: "创建向导",
+                items: [{ title: "填写基础信息", description: "申请标题和金额" }, { title: "确认附件", description: "上传合同" }]
+              },
+              {
+                id: "deliveryProgress",
+                type: "progressTracker",
+                title: "交付进度",
+                items: [{ label: "资料补齐", value: 60, description: "还缺合同扫描件" }]
+              },
+              {
+                id: "submitResult",
+                type: "resultPanel",
+                title: "提交结果",
+                emptyState: { title: "提交成功", description: "采购申请已进入审批流程" },
+                actions: [{ id: "backList", type: "navigate", label: "返回列表", targetPageId: "flow" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as SpecBifrostDocument;
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /class="kanban-board"/);
+  assert.match(html, /REQ-001/);
+  assert.match(html, /class="workflow-diagram"/);
+  assert.match(html, /提交/);
+  assert.match(html, /class="wizard-preview"/);
+  assert.match(html, /填写基础信息/);
+  assert.match(html, /class="progress-tracker"/);
+  assert.match(html, /资料补齐/);
+  assert.match(html, /class="result-panel"/);
+  assert.match(html, /提交成功/);
+});
+
 test("renderPrototypeHtml keeps batch table actions in the toolbar", () => {
   const spec: SpecBifrostDocument = {
     schemaVersion: "1.0",
