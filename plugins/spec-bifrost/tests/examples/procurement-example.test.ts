@@ -96,6 +96,12 @@ test("procurement example includes frontend and backend export samples", async (
     assert.match(text, /批量/);
     assert.match(text, /时间线/);
     assert.match(text, /树形|品类层级/);
+    assert.match(text, /可编辑明细|明细行/);
+    assert.match(text, /权限矩阵/);
+    assert.match(text, /业务规则|规则清单/);
+    assert.match(text, /审计日志|操作记录/);
+    assert.match(text, /评论|审批意见/);
+    assert.match(text, /关系图|关联单据/);
     assert.match(text, /不要包含接口定义、数据库设计、技术架构、代码结构或任务拆分/);
   }
 
@@ -107,6 +113,10 @@ test("procurement example includes frontend and backend export samples", async (
   assert.match(frontendText, /分组视图/);
   assert.match(frontendText, /抽屉/);
   assert.match(frontendText, /弹窗/);
+  assert.match(frontendText, /看板/);
+  assert.match(frontendText, /向导/);
+  assert.match(frontendText, /日历/);
+  assert.match(frontendText, /甘特/);
 
   const backendText = await readFile(samplePaths[1], "utf8");
   assert.match(backendText, /业务对象与字段口径/);
@@ -115,6 +125,9 @@ test("procurement example includes frontend and backend export samples", async (
   assert.match(backendText, /例外与备注/);
   assert.match(backendText, /驳回确认/);
   assert.match(backendText, /附件抽屉/);
+  assert.match(backendText, /权限口径/);
+  assert.match(backendText, /留痕/);
+  assert.match(backendText, /明细项口径/);
 });
 
 function hasGroupedCondition(value: unknown): boolean {

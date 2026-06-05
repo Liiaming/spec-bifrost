@@ -75,6 +75,26 @@ Supported component types:
 - `drawer`
 - `actionBar`
 - `textBlock`
+- `editableTable`
+- `treeTable`
+- `comparisonTable`
+- `kanbanBoard`
+- `workflowDiagram`
+- `wizard`
+- `progressTracker`
+- `resultPanel`
+- `chart`
+- `calendar`
+- `gantt`
+- `permissionMatrix`
+- `ruleList`
+- `checklist`
+- `auditLog`
+- `attachmentList`
+- `commentThread`
+- `orgChart`
+- `collapsePanel`
+- `relationGraph`
 
 Use these components for richer B-end requirement expression:
 
@@ -84,10 +104,30 @@ Use these components for richer B-end requirement expression:
 - `drawer`: side panels for detail, attachment, or contextual follow-up content.
 - `timeline`: chronological business events, approval records, operation logs, and status history.
 - `treeList`: hierarchical categories, departments, permission scopes, and procurement category trees.
+- `editableTable`: editable line-item requirements, row operations, and line-level validation facts.
+- `treeTable`: hierarchical table data such as category budgets or scoped permission rows.
+- `comparisonTable`: side-by-side supplier, plan, or option comparisons.
+- `kanbanBoard`: status-grouped cards for queues, approvals, and work tracking.
+- `workflowDiagram`: business workflow nodes and transitions.
+- `wizard`: multi-step creation or confirmation flows.
+- `progressTracker`: completion percentages or stage progress by business item.
+- `resultPanel`: submit success, failure, or next-step feedback.
+- `chart`: lightweight requirement facts for charts and dashboards.
+- `calendar`: dated business events, delivery dates, and schedules.
+- `gantt`: task schedule facts and dependencies.
+- `permissionMatrix`: role, page, operation, and field permission facts.
+- `ruleList`: business rules, approval thresholds, and constraints.
+- `checklist`: required materials, readiness checks, and pre-submit checks.
+- `auditLog`: operation records and traceability requirements.
+- `attachmentList`: uploaded, required, missing, or generated attachment facts.
+- `commentThread`: comments, approval opinions, and collaboration records.
+- `orgChart`: approval organization or reporting structures.
+- `collapsePanel`: grouped optional or secondary information.
+- `relationGraph`: business relationships between documents, people, entities, or process artifacts.
 - `table` toolbar actions can express batch operations when action labels or ids indicate batch behavior.
 - `file` fields express upload or attachment requirements.
 
-Do not use unsupported components such as chart, calendar, transfer, tour, carousel, rate, colorPicker, qrCode, or watermark in the MVP.
+Do not use unsupported components such as transfer, tour, carousel, rate, colorPicker, qrCode, watermark, mapView, or imageGallery in v0.3.
 
 Component and section `title` values, when present, must be non-empty strings.
 
@@ -96,6 +136,20 @@ When `emptyState` is present, it must include:
 - `title`: non-empty string
 - optional `description`: non-empty string
 - optional `notes`: array of non-empty strings
+
+## Relations
+
+Components may include `relations` when they need to express node-to-node business relationships.
+
+Supported relation fields:
+
+- `sourceId`: item id in the same component
+- `targetId`: item id in the same component
+- optional `label`: business-facing relationship label
+- optional `type`: business-facing relationship type
+- optional `notes`: array of requirement notes
+
+Use `relations` for `workflowDiagram`, `relationGraph`, `orgChart`, and `gantt`. Do not use `relations` for technical architecture, database relations, API dependencies, or implementation planning.
 
 ## Fields
 

@@ -21,6 +21,7 @@ Include:
 - navigation, conditional display, conditional enablement, conditional required state, and conditional routing
 - empty states, prompt copy, error copy, and status display
 - product notes from pages, sections, components, fields, actions, and buttons
+- Preserve v0.3 component facts such as editable tables, workflows, rules, permissions, attachments, comments, audit logs, charts, calendars, gantt plans, and relationship graphs.
 
 Do not include:
 
@@ -30,6 +31,7 @@ Do not include:
 - API call design
 - state management design
 - task breakdowns
+- Do not transform these facts into APIs, database schemas, code modules, component library choices, or task breakdowns.
 
 ## Backend Requirement Document
 

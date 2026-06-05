@@ -143,6 +143,10 @@ test("export skill defines role-specific document structure and boundaries", asy
   assert.match(text, /metricList/);
   assert.match(text, /timeline/);
   assert.match(text, /treeList/);
+  assert.match(text, /editableTable|可编辑明细/);
+  assert.match(text, /permissionMatrix|权限矩阵/);
+  assert.match(text, /workflowDiagram|工作流/);
+  assert.match(text, /relationGraph|关系图/);
   assert.match(text, /不要把后端版写成接口定义/);
   assert.match(text, /不要把前端版写成实现方案/);
 });
