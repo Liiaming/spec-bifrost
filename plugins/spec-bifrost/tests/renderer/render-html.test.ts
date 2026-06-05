@@ -345,6 +345,73 @@ test("renderPrototypeHtml renders requirement expressiveness components", () => 
   assert.doesNotMatch(html, /暂无内容配置/);
 });
 
+test("renderPrototypeHtml renders v0.3 data table components", () => {
+  const spec = {
+    schemaVersion: "1.0",
+    project: { name: "采购申请", description: "测试系统", actors: ["申请人"] },
+    pages: [
+      {
+        id: "detail",
+        title: "采购详情",
+        purpose: "查看明细和对比",
+        route: "/detail",
+        type: "detail",
+        sections: [
+          {
+            id: "tables",
+            components: [
+              {
+                id: "lineItems",
+                type: "editableTable",
+                title: "采购明细",
+                columns: [
+                  { id: "itemName", label: "物品名称", type: "text" },
+                  { id: "quantity", label: "数量", type: "number" },
+                  { id: "amount", label: "金额", type: "currency" }
+                ],
+                items: [{ itemName: "显示器", quantity: 2, amount: "¥3,200.00" }],
+                actions: [{ id: "addLine", type: "showMessage", label: "新增明细", message: "已新增明细行" }]
+              },
+              {
+                id: "categoryBudget",
+                type: "treeTable",
+                title: "类目预算",
+                columns: [
+                  { id: "name", label: "名称", type: "text" },
+                  { id: "budget", label: "预算", type: "currency" }
+                ],
+                items: [{ name: "办公用品", budget: "¥20,000.00", children: [{ name: "显示器", budget: "¥8,000.00" }] }]
+              },
+              {
+                id: "supplierComparison",
+                type: "comparisonTable",
+                title: "供应商对比",
+                columns: [
+                  { id: "metric", label: "对比项", type: "text" },
+                  { id: "supplierA", label: "供应商 A", type: "text" },
+                  { id: "supplierB", label: "供应商 B", type: "text" }
+                ],
+                items: [{ metric: "报价", supplierA: "¥12,800.00", supplierB: "¥13,500.00", recommended: "supplierA" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as SpecBifrostDocument;
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /class="editable-table-shell"/);
+  assert.match(html, /新增明细/);
+  assert.match(html, /class="tree-table-shell"/);
+  assert.match(html, /tree-cell/);
+  assert.match(html, /办公用品/);
+  assert.match(html, /class="comparison-table-shell"/);
+  assert.match(html, /供应商 A/);
+  assert.doesNotMatch(html, /暂无内容配置/);
+});
+
 test("renderPrototypeHtml keeps batch table actions in the toolbar", () => {
   const spec: SpecBifrostDocument = {
     schemaVersion: "1.0",

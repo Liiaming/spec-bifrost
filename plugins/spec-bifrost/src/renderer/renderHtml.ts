@@ -123,6 +123,12 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
       return renderFilterBar(component, context);
     case "table":
       return renderTable(component, context);
+    case "editableTable":
+      return renderEditableTable(component, context);
+    case "treeTable":
+      return renderTreeTable(component, context);
+    case "comparisonTable":
+      return renderComparisonTable(component, context);
     case "form":
       return renderForm(component, context);
     case "descriptionList":
@@ -223,6 +229,89 @@ function renderTableRows(component: ComponentSpec, columns: FieldSpec[], rowActi
       `
     )
     .join("");
+}
+
+function renderEditableTable(component: ComponentSpec, context: RenderContext): string {
+  const columns = component.columns ?? component.fields ?? [];
+  return `
+    <div class="editable-table-shell">
+      <div class="table-toolbar">
+        <div class="table-title-stack">
+          ${renderComponentTitle(component)}
+          <span class="table-summary">可编辑明细 · ${columns.length} 个字段 · ${normalizeRecords(component.items).length || 1} 条示例数据</span>
+        </div>
+        ${component.actions?.length ? `<div class="table-actions">${component.actions.map((action) => renderActionButton(action, "primary")).join("")}</div>` : ""}
+      </div>
+      <table class="data-table editable-table">
+        <thead><tr><th>行</th>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${renderEditableTableRows(component, columns, context)}</tbody>
+      </table>
+      ${columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无明细字段" }) : ""}
+    </div>
+  `;
+}
+
+function renderEditableTableRows(component: ComponentSpec, columns: FieldSpec[], context: RenderContext): string {
+  if (columns.length === 0) return "";
+  const rows = normalizeRecords(component.items);
+  const records = rows.length > 0 ? rows : [sampleRecord(columns, 0, context)];
+  return records
+    .slice(0, 4)
+    .map(
+      (record, index) => `
+        <tr>
+          <td class="row-index">${index + 1}</td>
+          ${columns.map((column) => `<td><span class="editable-cell">${renderTableCell(record[column.id], column, context)}</span></td>`).join("")}
+        </tr>
+      `
+    )
+    .join("");
+}
+
+function renderTreeTable(component: ComponentSpec, context: RenderContext): string {
+  const columns = component.columns ?? component.fields ?? [];
+  const records = normalizeRecords(component.items);
+  return `
+    <div class="tree-table-shell">
+      ${renderComponentTitle(component)}
+      <table class="data-table tree-table">
+        <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${records.length > 0 && columns.length > 0 ? renderTreeTableRows(records, columns, context) : ""}</tbody>
+      </table>
+      ${records.length === 0 || columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无层级表格数据" }) : ""}
+    </div>
+  `;
+}
+
+function renderTreeTableRows(records: Array<Record<string, unknown>>, columns: FieldSpec[], context: RenderContext, depth = 0): string {
+  return records
+    .map((record) => {
+      const children = normalizeRecords(Array.isArray(record.children) ? record.children : undefined);
+      return `
+        <tr>
+          ${columns
+            .map((column, index) => `<td class="${index === 0 ? "tree-cell" : ""}" style="${index === 0 ? `--tree-depth:${depth}` : ""}">${renderTableCell(record[column.id], column, context)}</td>`)
+            .join("")}
+        </tr>
+        ${children.length > 0 ? renderTreeTableRows(children, columns, context, depth + 1) : ""}
+      `;
+    })
+    .join("");
+}
+
+function renderComparisonTable(component: ComponentSpec, context: RenderContext): string {
+  const columns = component.columns ?? [];
+  const records = normalizeRecords(component.items);
+  return `
+    <div class="comparison-table-shell">
+      ${renderComponentTitle(component)}
+      <table class="data-table comparison-table">
+        <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${records.map((record) => `<tr>${columns.map((column) => `<td>${renderTableCell(record[column.id], column, context)}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table>
+      ${records.length === 0 || columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无对比数据" }) : ""}
+    </div>
+  `;
 }
 
 function normalizeRecords(items: unknown[] | undefined): Array<Record<string, unknown>> {
@@ -937,7 +1026,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 }
 .actions, .table-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .actions > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-.table-shell {
+.table-shell, .editable-table-shell, .tree-table-shell, .comparison-table-shell {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -979,6 +1068,37 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .data-table tr:last-child td { border-bottom: 0; }
 .data-table tbody tr:hover { background: var(--accent-tint); }
 .data-table td { font-variant-numeric: tabular-nums; }
+.editable-cell {
+  display: inline-flex;
+  min-width: 92px;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #ffffff;
+}
+.row-index {
+  width: 54px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.tree-cell {
+  padding-left: calc(14px + var(--tree-depth, 0) * 22px) !important;
+  font-weight: 650;
+}
+.tree-cell::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-left: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+}
+.comparison-table th:not(:first-child), .comparison-table td:not(:first-child) {
+  text-align: center;
+}
 td.row-actions { display: flex; gap: 10px; }
 .status-tag {
   display: inline-flex;
