@@ -64,7 +64,7 @@ test("valid page-driven spec passes", () => {
 test("unsupported component type fails with facts only", () => {
   const spec = validSpec();
   const component = spec.pages[0]!.sections[0]!.components[0]! as unknown as Record<string, unknown>;
-  component["type"] = "chart";
+  component["type"] = "unsupportedWidget";
 
   const result = validateSpec(spec);
 
@@ -102,6 +102,110 @@ test("requirement expressiveness components pass validation", () => {
 
   assert.equal(result.ok, true);
   assert.deepEqual(result.errors, []);
+});
+
+test("v0.3 requirement components and relations pass validation", () => {
+  const componentTypes = [
+    "editableTable",
+    "treeTable",
+    "comparisonTable",
+    "kanbanBoard",
+    "workflowDiagram",
+    "wizard",
+    "progressTracker",
+    "resultPanel",
+    "chart",
+    "calendar",
+    "gantt",
+    "permissionMatrix",
+    "ruleList",
+    "checklist",
+    "auditLog",
+    "attachmentList",
+    "commentThread",
+    "orgChart",
+    "collapsePanel",
+    "relationGraph"
+  ];
+  const spec = validSpec() as unknown as Record<string, unknown>;
+  const pages = spec["pages"] as Array<Record<string, unknown>>;
+  const sections = pages[0]!["sections"] as Array<Record<string, unknown>>;
+  const components = sections[0]!["components"] as Array<Record<string, unknown>>;
+
+  componentTypes.forEach((componentType, index) => {
+    components.push({
+      id: `${componentType}Demo`,
+      type: componentType,
+      title: `${componentType} 示例`,
+      columns: [{ id: `${componentType}Name`, label: "名称", type: "text" }],
+      items: [
+        { id: `${componentType}-a`, title: "节点 A", value: "12" },
+        { id: `${componentType}-b`, title: "节点 B", value: "8" }
+      ],
+      relations: index % 2 === 0 ? [{ sourceId: `${componentType}-a`, targetId: `${componentType}-b`, label: "流转" }] : undefined
+    });
+  });
+
+  const result = validateSpec(spec);
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.errors, []);
+});
+
+test("component relations must be valid objects with string endpoints", () => {
+  const spec = validSpec() as unknown as Record<string, unknown>;
+  const pages = spec["pages"] as Array<Record<string, unknown>>;
+  const sections = pages[0]!["sections"] as Array<Record<string, unknown>>;
+  const components = sections[0]!["components"] as Array<Record<string, unknown>>;
+  components.push({
+    id: "workflow",
+    type: "workflowDiagram",
+    items: [{ id: "draft", title: "草稿" }, { id: "submitted", title: "已提交" }],
+    relations: [null, { sourceId: "", targetId: 100, label: false, type: 12, notes: [false] }]
+  });
+
+  const result = validateSpec(spec);
+
+  assert.equal(result.ok, false);
+  assert.deepEqual(
+    result.errors.map((diagnostic) => diagnostic.path),
+    [
+      "pages[0].sections[0].components[1].relations[0]",
+      "pages[0].sections[0].components[1].relations[1].sourceId",
+      "pages[0].sections[0].components[1].relations[1].targetId",
+      "pages[0].sections[0].components[1].relations[1].label",
+      "pages[0].sections[0].components[1].relations[1].type",
+      "pages[0].sections[0].components[1].relations[1].notes"
+    ]
+  );
+});
+
+test("component relations must reference item ids from the same component", () => {
+  const spec = validSpec() as unknown as Record<string, unknown>;
+  const pages = spec["pages"] as Array<Record<string, unknown>>;
+  const sections = pages[0]!["sections"] as Array<Record<string, unknown>>;
+  const components = sections[0]!["components"] as Array<Record<string, unknown>>;
+  components.push({
+    id: "workflow",
+    type: "workflowDiagram",
+    items: [{ id: "draft", title: "草稿" }, { id: "submitted", title: "已提交" }],
+    relations: [
+      { sourceId: "draft", targetId: "missingTarget", label: "提交" },
+      { sourceId: "missingSource", targetId: "submitted", label: "退回" }
+    ]
+  });
+
+  const result = validateSpec(spec);
+
+  assert.equal(result.ok, false);
+  assert.deepEqual(
+    result.errors.map((diagnostic) => diagnostic.path),
+    [
+      "pages[0].sections[0].components[1].relations[0].targetId",
+      "pages[0].sections[0].components[1].relations[1].sourceId"
+    ]
+  );
+  assert.equal(result.errors[0]?.type, "reference_error");
 });
 
 test("notes are allowed on page section component field and action", () => {
@@ -416,6 +520,7 @@ test("malformed component arrays return schema errors instead of throwing", () =
   components[0]!["columns"] = "not-an-array";
   components[0]!["actions"] = "not-an-array";
   components[0]!["items"] = "not-an-array";
+  components[0]!["relations"] = "not-an-array";
 
   const result = validateSpec(spec);
 
@@ -426,7 +531,8 @@ test("malformed component arrays return schema errors instead of throwing", () =
       "pages[0].sections[0].components[0].fields",
       "pages[0].sections[0].components[0].columns",
       "pages[0].sections[0].components[0].actions",
-      "pages[0].sections[0].components[0].items"
+      "pages[0].sections[0].components[0].items",
+      "pages[0].sections[0].components[0].relations"
     ]
   );
 });

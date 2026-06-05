@@ -55,6 +55,7 @@ export interface ComponentSpec {
   columns?: FieldSpec[];
   actions?: ActionSpec[];
   items?: unknown[];
+  relations?: RelationSpec[];
   emptyState?: EmptyStateSpec;
   notes?: Notes;
 }
@@ -92,6 +93,14 @@ export interface EmptyStateSpec {
   notes?: Notes;
 }
 
+export interface RelationSpec {
+  sourceId: string;
+  targetId: string;
+  label?: string;
+  type?: string;
+  notes?: Notes;
+}
+
 export interface ConditionSpec {
   fieldId?: string;
   operator?: ConditionOperator;
@@ -120,7 +129,27 @@ export type ComponentType =
   | "modal"
   | "drawer"
   | "actionBar"
-  | "textBlock";
+  | "textBlock"
+  | "editableTable"
+  | "treeTable"
+  | "comparisonTable"
+  | "kanbanBoard"
+  | "workflowDiagram"
+  | "wizard"
+  | "progressTracker"
+  | "resultPanel"
+  | "chart"
+  | "calendar"
+  | "gantt"
+  | "permissionMatrix"
+  | "ruleList"
+  | "checklist"
+  | "auditLog"
+  | "attachmentList"
+  | "commentThread"
+  | "orgChart"
+  | "collapsePanel"
+  | "relationGraph";
 
 export type FieldType =
   | "text"
