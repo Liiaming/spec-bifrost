@@ -534,6 +534,77 @@ test("renderPrototypeHtml renders v0.3 planning and visualization components", (
   assert.match(html, /合同确认/);
 });
 
+test("renderPrototypeHtml renders v0.3 governance collaboration and structure components", () => {
+  const spec = {
+    schemaVersion: "1.0",
+    project: { name: "采购治理", description: "测试系统", actors: ["管理员"] },
+    pages: [
+      {
+        id: "governance",
+        title: "治理工作台",
+        purpose: "查看权限、规则和协作记录",
+        route: "/governance",
+        type: "reference",
+        sections: [
+          {
+            id: "components",
+            components: [
+              {
+                id: "permissions",
+                type: "permissionMatrix",
+                title: "权限矩阵",
+                columns: [{ id: "role", label: "角色", type: "text" }, { id: "approve", label: "审批", type: "status" }],
+                items: [{ role: "部门负责人", approve: "允许" }]
+              },
+              { id: "rules", type: "ruleList", title: "业务规则", items: [{ title: "金额超过 50000 元必须进入大额审批" }] },
+              { id: "materials", type: "checklist", title: "资料清单", items: [{ title: "合同扫描件", required: true, status: "必填" }] },
+              {
+                id: "logs",
+                type: "auditLog",
+                title: "审计日志",
+                columns: [{ id: "time", label: "时间", type: "text" }, { id: "event", label: "事件", type: "text" }],
+                items: [{ time: "2026-06-01 10:00", event: "提交审批" }]
+              },
+              { id: "attachments", type: "attachmentList", title: "附件列表", items: [{ title: "合同.pdf", status: "已上传", description: "供应商合同" }] },
+              { id: "comments", type: "commentThread", title: "审批意见", items: [{ author: "张三", time: "2026-06-01 11:00", content: "预算归属已确认" }] },
+              { id: "org", type: "orgChart", title: "审批组织", items: [{ id: "dept", title: "部门负责人", children: [{ id: "finance", title: "财务审批" }] }] },
+              { id: "panels", type: "collapsePanel", title: "折叠信息", items: [{ title: "财务信息", description: "预算、科目和付款方式" }] },
+              {
+                id: "relations",
+                type: "relationGraph",
+                title: "关联单据",
+                items: [{ id: "request", title: "采购申请" }, { id: "contract", title: "合同" }],
+                relations: [{ sourceId: "request", targetId: "contract", label: "生成" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as SpecBifrostDocument;
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /class="permission-matrix-shell"/);
+  assert.match(html, /部门负责人/);
+  assert.match(html, /class="rule-list-preview"/);
+  assert.match(html, /50000/);
+  assert.match(html, /class="checklist-preview"/);
+  assert.match(html, /合同扫描件/);
+  assert.match(html, /class="audit-log-shell"/);
+  assert.match(html, /提交审批/);
+  assert.match(html, /class="attachment-list-preview"/);
+  assert.match(html, /合同\.pdf/);
+  assert.match(html, /class="comment-thread-preview"/);
+  assert.match(html, /预算归属已确认/);
+  assert.match(html, /class="org-chart-preview"/);
+  assert.match(html, /财务审批/);
+  assert.match(html, /class="collapse-panel-preview"/);
+  assert.match(html, /财务信息/);
+  assert.match(html, /class="relation-graph-preview"/);
+  assert.match(html, /生成/);
+});
+
 test("renderPrototypeHtml keeps batch table actions in the toolbar", () => {
   const spec: SpecBifrostDocument = {
     schemaVersion: "1.0",

@@ -145,6 +145,24 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
       return renderCalendar(component);
     case "gantt":
       return renderGantt(component);
+    case "permissionMatrix":
+      return renderPermissionMatrix(component, context);
+    case "ruleList":
+      return renderRuleList(component);
+    case "checklist":
+      return renderChecklist(component);
+    case "auditLog":
+      return renderAuditLog(component, context);
+    case "attachmentList":
+      return renderAttachmentList(component);
+    case "commentThread":
+      return renderCommentThread(component);
+    case "orgChart":
+      return renderOrgChart(component);
+    case "collapsePanel":
+      return renderCollapsePanel(component);
+    case "relationGraph":
+      return renderRelationGraph(component);
     case "form":
       return renderForm(component, context);
     case "descriptionList":
@@ -618,6 +636,56 @@ function renderTreeNodes(records: Array<Record<string, unknown>>, isRoot = false
       `;
     })
     .join("")}</ul>`;
+}
+
+function renderPermissionMatrix(component: ComponentSpec, context: RenderContext): string {
+  return `<div class="permission-matrix-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无权限矩阵")}</div>`;
+}
+
+function renderAuditLog(component: ComponentSpec, context: RenderContext): string {
+  return `<div class="audit-log-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无审计记录")}</div>`;
+}
+
+function renderTableBodyOnly(component: ComponentSpec, context: RenderContext, emptyTitle: string): string {
+  const columns = component.columns ?? component.fields ?? [];
+  const records = normalizeRecords(component.items);
+  if (columns.length === 0 || records.length === 0) return renderEmptyState(component.emptyState ?? { title: emptyTitle });
+  return `<table class="data-table"><thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead><tbody>${records.map((record) => `<tr>${columns.map((column) => `<td>${renderTableCell(record[column.id], column, context)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+function renderRuleList(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<ol class="rule-list-preview">${records.map((record, index) => `<li><span>规则 ${index + 1}</span><strong>${escapeHtml(record.title ?? record.label ?? "规则")}</strong>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</li>`).join("")}</ol>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无规则" }) : ""}`;
+}
+
+function renderChecklist(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<ul class="checklist-preview">${records.map((record) => `<li><span aria-hidden="true"></span><div><strong>${escapeHtml(record.title ?? record.label ?? "检查项")}</strong>${record.status ? `<em>${escapeHtml(record.status)}</em>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</div></li>`).join("")}</ul>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无检查项" }) : ""}`;
+}
+
+function renderAttachmentList(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<div class="attachment-list-preview">${records.map((record) => `<article><strong>${escapeHtml(record.title ?? record.name ?? "附件")}</strong>${record.status ? `<span class="status-tag">${escapeHtml(record.status)}</span>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</article>`).join("")}</div>${renderActionBar(component.actions)}${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无附件" }) : ""}`;
+}
+
+function renderCommentThread(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<ol class="comment-thread-preview">${records.map((record) => `<li><header><strong>${escapeHtml(record.author ?? record.user ?? "评论人")}</strong><time>${escapeHtml(record.time ?? "")}</time></header><p>${escapeHtml(record.content ?? record.description ?? record.title ?? "评论内容")}</p></li>`).join("")}</ol>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无评论" }) : ""}`;
+}
+
+function renderOrgChart(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<div class="org-chart-preview">${renderTreeNodes(records, true)}${renderRelationList(component)}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无组织结构" }) : ""}`;
+}
+
+function renderCollapsePanel(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<div class="collapse-panel-preview">${records.map((record, index) => `<details ${index === 0 ? "open" : ""}><summary>${escapeHtml(record.title ?? record.label ?? "信息组")}</summary>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</details>`).join("")}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无折叠内容" }) : ""}`;
+}
+
+function renderRelationGraph(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `${renderComponentTitle(component)}<div class="relation-graph-preview"><div class="relation-nodes">${records.map((record) => `<span>${escapeHtml(record.title ?? record.label ?? record.id ?? "节点")}</span>`).join("")}</div>${renderRelationList(component)}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无关系节点" }) : ""}`;
 }
 
 function renderCardList(component: ComponentSpec): string {
@@ -1467,6 +1535,35 @@ td.row-actions { display: flex; gap: 10px; }
   margin-right: 8px;
 }
 .tree-node span { color: var(--muted); font-size: 12px; }
+.permission-matrix-shell, .audit-log-shell, .rule-list-preview, .checklist-preview, .attachment-list-preview, .comment-thread-preview, .org-chart-preview, .collapse-panel-preview, .relation-graph-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.permission-matrix-shell, .audit-log-shell { overflow-x: auto; }
+.rule-list-preview, .checklist-preview, .comment-thread-preview {
+  margin: 0;
+  padding: 12px 14px;
+}
+.rule-list-preview li, .checklist-preview li, .comment-thread-preview li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.rule-list-preview li:last-child, .checklist-preview li:last-child, .comment-thread-preview li:last-child { border-bottom: 0; }
+.rule-list-preview span { display: block; color: var(--muted); font-size: 12px; }
+.checklist-preview { list-style: none; }
+.checklist-preview li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; }
+.checklist-preview li > span { width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 4px; margin-top: 2px; }
+.checklist-preview em { margin-left: 8px; color: var(--muted); font-size: 12px; font-style: normal; }
+.attachment-list-preview { display: grid; gap: 10px; padding: 12px; }
+.attachment-list-preview article { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.comment-thread-preview header { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+.org-chart-preview, .collapse-panel-preview, .relation-graph-preview { padding: 12px; }
+.collapse-panel-preview details { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--panel-soft); }
+.collapse-panel-preview summary { cursor: default; font-weight: 650; }
+.relation-nodes { display: flex; flex-wrap: wrap; gap: 8px; }
+.relation-nodes span { border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; background: var(--panel-soft); }
 .card-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .card-list article, .empty-state, .simple-component, .inline-alert {
   border: 1px solid var(--line);
