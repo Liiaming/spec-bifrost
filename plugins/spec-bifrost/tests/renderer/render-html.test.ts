@@ -480,6 +480,60 @@ test("renderPrototypeHtml renders v0.3 flow and state components", () => {
   assert.match(html, /提交成功/);
 });
 
+test("renderPrototypeHtml renders v0.3 planning and visualization components", () => {
+  const spec = {
+    schemaVersion: "1.0",
+    project: { name: "采购计划", description: "测试系统", actors: ["采购专员"] },
+    pages: [
+      {
+        id: "plan",
+        title: "计划看板",
+        purpose: "查看预算和交付计划",
+        route: "/plan",
+        type: "reference",
+        sections: [
+          {
+            id: "visual",
+            components: [
+              {
+                id: "budgetChart",
+                type: "chart",
+                title: "预算占用",
+                items: [{ label: "办公用品", value: 68 }, { label: "IT 设备", value: 32 }]
+              },
+              {
+                id: "deliveryCalendar",
+                type: "calendar",
+                title: "交付日历",
+                items: [{ date: "2026-06-12", title: "供应商交付", status: "待确认" }]
+              },
+              {
+                id: "deliveryGantt",
+                type: "gantt",
+                title: "交付排期",
+                items: [
+                  { id: "contract", title: "合同确认", startDate: "2026-06-01", endDate: "2026-06-05" },
+                  { id: "delivery", title: "设备交付", startDate: "2026-06-06", endDate: "2026-06-12" }
+                ],
+                relations: [{ sourceId: "contract", targetId: "delivery", label: "完成后开始" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as SpecBifrostDocument;
+
+  const html = renderPrototypeHtml({ spec, diagnostics: [] });
+
+  assert.match(html, /class="chart-preview"/);
+  assert.match(html, /办公用品/);
+  assert.match(html, /class="calendar-preview"/);
+  assert.match(html, /2026-06-12/);
+  assert.match(html, /class="gantt-preview"/);
+  assert.match(html, /合同确认/);
+});
+
 test("renderPrototypeHtml keeps batch table actions in the toolbar", () => {
   const spec: SpecBifrostDocument = {
     schemaVersion: "1.0",

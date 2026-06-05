@@ -139,6 +139,12 @@ function renderComponent(component: ComponentSpec, context: RenderContext): stri
       return renderProgressTracker(component);
     case "resultPanel":
       return renderResultPanel(component);
+    case "chart":
+      return renderChart(component);
+    case "calendar":
+      return renderCalendar(component);
+    case "gantt":
+      return renderGantt(component);
     case "form":
       return renderForm(component, context);
     case "descriptionList":
@@ -521,6 +527,46 @@ function renderResultPanel(component: ComponentSpec): string {
       ${renderEmptyState(component.emptyState ?? { title: "处理完成" })}
       ${renderActionBar(component.actions)}
     </div>
+  `;
+}
+
+function renderChart(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  const maxValue = Math.max(1, ...records.map((record) => (typeof record.value === "number" ? record.value : Number(record.value) || 0)));
+  return `
+    ${renderComponentTitle(component)}
+    <div class="chart-preview">
+      ${records
+        .map((record) => {
+          const value = typeof record.value === "number" ? record.value : Number(record.value) || 0;
+          return `<div class="chart-row"><span>${escapeHtml(record.label ?? record.title ?? "分类")}</span><div><i style="width:${Math.round((value / maxValue) * 100)}%"></i></div><strong>${escapeHtml(record.value ?? "-")}</strong></div>`;
+        })
+        .join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无图表数据" }) : ""}
+  `;
+}
+
+function renderCalendar(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="calendar-preview">
+      ${records.map((record) => `<article><time>${escapeHtml(record.date ?? record.startDate ?? "")}</time><strong>${escapeHtml(record.title ?? record.label ?? "日程")}</strong>${record.status ? `<span class="status-tag">${escapeHtml(record.status)}</span>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</article>`).join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无日程" }) : ""}
+  `;
+}
+
+function renderGantt(component: ComponentSpec): string {
+  const records = normalizeRecords(component.items);
+  return `
+    ${renderComponentTitle(component)}
+    <div class="gantt-preview">
+      ${records.map((record, index) => `<div class="gantt-row"><span>${escapeHtml(record.title ?? record.label ?? `任务 ${index + 1}`)}</span><div><i style="margin-left:${Math.min(index * 8, 40)}%;width:${Math.max(22, 48 - index * 4)}%"></i></div><time>${escapeHtml(record.startDate ?? "")} - ${escapeHtml(record.endDate ?? "")}</time></div>`).join("")}
+      ${renderRelationList(component)}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无排期任务" }) : ""}
   `;
 }
 
@@ -1342,6 +1388,25 @@ td.row-actions { display: flex; gap: 10px; }
 .progress-bar span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
 .progress-bar em { position: absolute; right: 0; top: -22px; color: var(--muted); font-size: 12px; font-style: normal; }
 .result-panel { border-color: rgba(4, 120, 87, 0.22); background: var(--success-soft); }
+.chart-preview, .calendar-preview, .gantt-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.chart-row { display: grid; grid-template-columns: 120px 1fr 72px; gap: 12px; align-items: center; padding: 8px 0; }
+.chart-row div { height: 12px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.chart-row i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.chart-row strong { text-align: right; font-variant-numeric: tabular-nums; }
+.calendar-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.calendar-preview article { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.calendar-preview time { display: block; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.gantt-row { display: grid; grid-template-columns: 150px 1fr 180px; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.gantt-row:last-child { border-bottom: 0; }
+.gantt-row div { height: 18px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.gantt-row i { display: block; height: 100%; border-radius: inherit; background: rgba(37, 99, 235, 0.76); }
+.gantt-row time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .timeline-list {
   margin: 0;
   padding: 12px;
