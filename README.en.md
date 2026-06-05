@@ -64,6 +64,7 @@ flowchart LR
 - Supports notes on pages, sections, components, fields, actions, and buttons.
 - Supports common business UI patterns such as forms, filters, tables, detail views, steps, cards, and empty states.
 - Supports more complex requirement expression through metrics, tabs, modals, drawers, timelines, tree structures, file fields, and batch actions.
+- Supports richer requirement components such as editable tables, tree tables, comparison tables, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, and relation graphs.
 - Supports field rules, conditional display, conditional required fields, and page navigation.
 - Uses a last-known-good renderer strategy and keeps the previous valid preview when the current JSON cannot render.
 - Guides Claude Code or Codex to export frontend and backend Markdown requirement documents.
@@ -263,7 +264,7 @@ The procurement system example demonstrates a small multi-page business-facing s
 plugins/spec-bifrost/examples/procurement-system/spec-bifrost.json
 ```
 
-It covers option sets, forms, filters, tables, detail views, steps, cards, metrics, tabs, modals, drawers, timelines, tree structures, files, batch actions, conditional display, conditional required fields, navigation actions, and notes.
+It covers option sets, forms, filters, tables, detail views, steps, cards, metrics, tabs, modals, drawers, timelines, tree structures, editable tables, tree tables, supplier comparisons, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, relation graphs, batch actions, conditional display, conditional required fields, navigation actions, and notes.
 
 The example directory also includes export samples that can be used as output quality references:
 

@@ -1,5 +1,18 @@
 # 更新日志 / Changelog
 
+## 0.3.0
+
+- 扩展 v0.3 需求表达组件，新增可编辑明细表、层级表格、对比表、看板、工作流、向导、进度、结果反馈、图表、日历、甘特、权限矩阵、规则清单、检查清单、审计日志、附件列表、评论串、组织结构、折叠面板和关系图。
+- 新增 `relations` 字段，用于表达工作流、关系图、组织结构和甘特等组件内的业务节点关系，并校验关系端点引用。
+- 为全部 v0.3 组件提供低噪声 B 端语义化预览渲染。
+- 丰富采购申请管理系统示例，覆盖全部 v0.3 组件和前后端导出样例。
+- 同步更新中英文 README、插件 README、schema skill、export skill 和预览截图。
+- Expanded v0.3 requirement-expression components with editable tables, tree tables, comparison tables, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, and relation graphs.
+- Added `relations` for business node relationships inside workflows, relation graphs, org charts, and gantt components, with endpoint reference validation.
+- Added low-noise B-end semantic preview rendering for all v0.3 components.
+- Expanded the procurement request management example to cover every v0.3 component and the frontend/backend export samples.
+- Updated Chinese/English README files, plugin README, schema skill, export skill, and the preview screenshot.
+
 ## 0.2.1
 
 - 收敛预览页视觉风格，改为更克制、低干扰的 B 端工作台界面。
