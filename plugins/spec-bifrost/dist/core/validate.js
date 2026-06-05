@@ -89,6 +89,7 @@ function validateComponent(component, path, errors, pageContext) {
     validateOptionalArray(component.columns, `${path}.columns`, "columns", errors, componentContext)?.forEach((field, fieldIndex) => validateField(field, `${path}.columns[${fieldIndex}]`, errors, componentContext));
     validateOptionalArray(component.actions, `${path}.actions`, "actions", errors, componentContext)?.forEach((action, actionIndex) => validateAction(action, `${path}.actions[${actionIndex}]`, errors, componentContext));
     validateOptionalArray(component.items, `${path}.items`, "items", errors, componentContext);
+    validateOptionalArray(component.relations, `${path}.relations`, "relations", errors, componentContext)?.forEach((relation, relationIndex) => validateRelation(relation, `${path}.relations[${relationIndex}]`, errors, componentContext));
 }
 function validateField(field, path, errors, componentContext) {
     if (!isRecord(field)) {
@@ -128,6 +129,17 @@ function validateAction(action, path, errors, componentContext) {
     validateOptionalString(action.message, `${path}.message`, errors, actionContext);
     validateNotes(action.notes, `${path}.notes`, errors, actionContext);
     validateCondition(action.actionWhen, `${path}.actionWhen`, errors, actionContext);
+}
+function validateRelation(relation, path, errors, componentContext) {
+    if (!isRecord(relation)) {
+        errors.push(error("schema_error", path, "relation must be an object.", relation, componentContext));
+        return;
+    }
+    requireString(relation["sourceId"], `${path}.sourceId`, errors, componentContext);
+    requireString(relation["targetId"], `${path}.targetId`, errors, componentContext);
+    validateOptionalString(relation["label"], `${path}.label`, errors, componentContext);
+    validateOptionalString(relation["type"], `${path}.type`, errors, componentContext);
+    validateNotes(relation["notes"], `${path}.notes`, errors, componentContext);
 }
 function validateCondition(condition, path, errors, context) {
     if (condition === undefined)
@@ -252,6 +264,7 @@ function validateReferences(spec, errors) {
                         validateConditionReferences(action["actionWhen"], `${actionPath}.actionWhen`, fieldIds, errors, actionContext);
                     });
                 }
+                validateRelationReferences(component["relations"], `${componentPath}.relations`, component["items"], errors, componentContext);
             });
         });
     });
@@ -335,6 +348,38 @@ function validateConditionReferences(condition, path, fieldIds, errors, context)
     if (Array.isArray(condition.any)) {
         condition.any.forEach((child, index) => validateConditionReferences(child, `${path}.any[${index}]`, fieldIds, errors, context));
     }
+}
+function validateRelationReferences(relations, path, items, errors, context) {
+    if (!Array.isArray(relations))
+        return;
+    const itemIds = collectItemIds(items);
+    relations.forEach((relation, relationIndex) => {
+        if (!isRecord(relation))
+            return;
+        const sourceId = relation["sourceId"];
+        const targetId = relation["targetId"];
+        if (typeof sourceId === "string" && sourceId.length > 0 && !itemIds.has(sourceId)) {
+            errors.push(error("reference_error", `${path}[${relationIndex}].sourceId`, `sourceId "${sourceId}" does not match any item id in the component.`, sourceId, context));
+        }
+        if (typeof targetId === "string" && targetId.length > 0 && !itemIds.has(targetId)) {
+            errors.push(error("reference_error", `${path}[${relationIndex}].targetId`, `targetId "${targetId}" does not match any item id in the component.`, targetId, context));
+        }
+    });
+}
+function collectItemIds(items) {
+    const ids = new Set();
+    if (!Array.isArray(items))
+        return ids;
+    collectItemIdsRecursive(items, ids);
+    return ids;
+}
+function collectItemIdsRecursive(items, ids) {
+    items.filter(isRecord).forEach((item) => {
+        if (typeof item["id"] === "string" && item["id"].length > 0)
+            ids.add(item["id"]);
+        if (Array.isArray(item["children"]))
+            collectItemIdsRecursive(item["children"], ids);
+    });
 }
 function validateNotes(notes, path, errors, context) {
     if (notes === undefined)

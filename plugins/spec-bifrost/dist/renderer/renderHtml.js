@@ -97,6 +97,46 @@ function renderComponent(component, context) {
             return renderFilterBar(component, context);
         case "table":
             return renderTable(component, context);
+        case "editableTable":
+            return renderEditableTable(component, context);
+        case "treeTable":
+            return renderTreeTable(component, context);
+        case "comparisonTable":
+            return renderComparisonTable(component, context);
+        case "kanbanBoard":
+            return renderKanbanBoard(component);
+        case "workflowDiagram":
+            return renderWorkflowDiagram(component);
+        case "wizard":
+            return renderWizard(component);
+        case "progressTracker":
+            return renderProgressTracker(component);
+        case "resultPanel":
+            return renderResultPanel(component);
+        case "chart":
+            return renderChart(component);
+        case "calendar":
+            return renderCalendar(component);
+        case "gantt":
+            return renderGantt(component);
+        case "permissionMatrix":
+            return renderPermissionMatrix(component, context);
+        case "ruleList":
+            return renderRuleList(component);
+        case "checklist":
+            return renderChecklist(component);
+        case "auditLog":
+            return renderAuditLog(component, context);
+        case "attachmentList":
+            return renderAttachmentList(component);
+        case "commentThread":
+            return renderCommentThread(component);
+        case "orgChart":
+            return renderOrgChart(component);
+        case "collapsePanel":
+            return renderCollapsePanel(component);
+        case "relationGraph":
+            return renderRelationGraph(component);
         case "form":
             return renderForm(component, context);
         case "descriptionList":
@@ -192,6 +232,83 @@ function renderTableRows(component, columns, rowActions, context) {
         </tr>
       `)
         .join("");
+}
+function renderEditableTable(component, context) {
+    const columns = component.columns ?? component.fields ?? [];
+    return `
+    <div class="editable-table-shell">
+      <div class="table-toolbar">
+        <div class="table-title-stack">
+          ${renderComponentTitle(component)}
+          <span class="table-summary">可编辑明细 · ${columns.length} 个字段 · ${normalizeRecords(component.items).length || 1} 条示例数据</span>
+        </div>
+        ${component.actions?.length ? `<div class="table-actions">${component.actions.map((action) => renderActionButton(action, "primary")).join("")}</div>` : ""}
+      </div>
+      <table class="data-table editable-table">
+        <thead><tr><th>行</th>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${renderEditableTableRows(component, columns, context)}</tbody>
+      </table>
+      ${columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无明细字段" }) : ""}
+    </div>
+  `;
+}
+function renderEditableTableRows(component, columns, context) {
+    if (columns.length === 0)
+        return "";
+    const rows = normalizeRecords(component.items);
+    const records = rows.length > 0 ? rows : [sampleRecord(columns, 0, context)];
+    return records
+        .slice(0, 4)
+        .map((record, index) => `
+        <tr>
+          <td class="row-index">${index + 1}</td>
+          ${columns.map((column) => `<td><span class="editable-cell">${renderTableCell(record[column.id], column, context)}</span></td>`).join("")}
+        </tr>
+      `)
+        .join("");
+}
+function renderTreeTable(component, context) {
+    const columns = component.columns ?? component.fields ?? [];
+    const records = normalizeRecords(component.items);
+    return `
+    <div class="tree-table-shell">
+      ${renderComponentTitle(component)}
+      <table class="data-table tree-table">
+        <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${records.length > 0 && columns.length > 0 ? renderTreeTableRows(records, columns, context) : ""}</tbody>
+      </table>
+      ${records.length === 0 || columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无层级表格数据" }) : ""}
+    </div>
+  `;
+}
+function renderTreeTableRows(records, columns, context, depth = 0) {
+    return records
+        .map((record) => {
+        const children = normalizeRecords(Array.isArray(record.children) ? record.children : undefined);
+        return `
+        <tr>
+          ${columns
+            .map((column, index) => `<td class="${index === 0 ? "tree-cell" : ""}" style="${index === 0 ? `--tree-depth:${depth}` : ""}">${renderTableCell(record[column.id], column, context)}</td>`)
+            .join("")}
+        </tr>
+        ${children.length > 0 ? renderTreeTableRows(children, columns, context, depth + 1) : ""}
+      `;
+    })
+        .join("");
+}
+function renderComparisonTable(component, context) {
+    const columns = component.columns ?? [];
+    const records = normalizeRecords(component.items);
+    return `
+    <div class="comparison-table-shell">
+      ${renderComponentTitle(component)}
+      <table class="data-table comparison-table">
+        <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+        <tbody>${records.map((record) => `<tr>${columns.map((column) => `<td>${renderTableCell(record[column.id], column, context)}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table>
+      ${records.length === 0 || columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无对比数据" }) : ""}
+    </div>
+  `;
 }
 function normalizeRecords(items) {
     if (!items)
@@ -318,6 +435,100 @@ function renderDrawer(component, context) {
     </aside>
   `;
 }
+function renderKanbanBoard(component) {
+    const columns = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="kanban-board">
+      ${columns
+        .map((column) => {
+        const cards = normalizeRecords(Array.isArray(column.children) ? column.children : undefined);
+        return `<section class="kanban-column"><h4>${escapeHtml(column.title ?? column.label ?? "状态")}</h4>${cards
+            .map((card) => `<article class="kanban-card"><strong>${escapeHtml(card.title ?? card.label ?? "卡片")}</strong>${card.description ? `<p>${escapeHtml(card.description)}</p>` : ""}</article>`)
+            .join("")}</section>`;
+    })
+        .join("")}
+    </div>
+    ${columns.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无看板数据" }) : ""}
+  `;
+}
+function renderWorkflowDiagram(component) {
+    const nodes = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="workflow-diagram">
+      <div class="workflow-nodes">${nodes.map((node, index) => `<div class="workflow-node"><span>${index + 1}</span><strong>${escapeHtml(node.title ?? node.label ?? node.id ?? "节点")}</strong>${node.description ? `<p>${escapeHtml(node.description)}</p>` : ""}</div>`).join("")}</div>
+      ${renderRelationList(component)}
+    </div>
+    ${nodes.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无流程节点" }) : ""}
+  `;
+}
+function renderWizard(component) {
+    const steps = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="wizard-preview">
+      <ol>${steps.map((step, index) => `<li class="${index === 0 ? "active" : ""}"><span>${index + 1}</span><strong>${escapeHtml(step.title ?? step.label ?? `步骤 ${index + 1}`)}</strong>${step.description ? `<p>${escapeHtml(step.description)}</p>` : ""}</li>`).join("")}</ol>
+    </div>
+    ${steps.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无向导步骤" }) : ""}
+  `;
+}
+function renderProgressTracker(component) {
+    const records = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="progress-tracker">
+      ${records.map((record) => `<div class="progress-row"><div><strong>${escapeHtml(record.label ?? record.title ?? "进度")}</strong>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</div>${renderProgressBar(record.value)}</div>`).join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无进度数据" }) : ""}
+  `;
+}
+function renderResultPanel(component) {
+    return `
+    <div class="result-panel">
+      ${renderComponentTitle(component)}
+      ${renderEmptyState(component.emptyState ?? { title: "处理完成" })}
+      ${renderActionBar(component.actions)}
+    </div>
+  `;
+}
+function renderChart(component) {
+    const records = normalizeRecords(component.items);
+    const maxValue = Math.max(1, ...records.map((record) => (typeof record.value === "number" ? record.value : Number(record.value) || 0)));
+    return `
+    ${renderComponentTitle(component)}
+    <div class="chart-preview">
+      ${records
+        .map((record) => {
+        const value = typeof record.value === "number" ? record.value : Number(record.value) || 0;
+        return `<div class="chart-row"><span>${escapeHtml(record.label ?? record.title ?? "分类")}</span><div><i style="width:${Math.round((value / maxValue) * 100)}%"></i></div><strong>${escapeHtml(record.value ?? "-")}</strong></div>`;
+    })
+        .join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无图表数据" }) : ""}
+  `;
+}
+function renderCalendar(component) {
+    const records = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="calendar-preview">
+      ${records.map((record) => `<article><time>${escapeHtml(record.date ?? record.startDate ?? "")}</time><strong>${escapeHtml(record.title ?? record.label ?? "日程")}</strong>${record.status ? `<span class="status-tag">${escapeHtml(record.status)}</span>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</article>`).join("")}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无日程" }) : ""}
+  `;
+}
+function renderGantt(component) {
+    const records = normalizeRecords(component.items);
+    return `
+    ${renderComponentTitle(component)}
+    <div class="gantt-preview">
+      ${records.map((record, index) => `<div class="gantt-row"><span>${escapeHtml(record.title ?? record.label ?? `任务 ${index + 1}`)}</span><div><i style="margin-left:${Math.min(index * 8, 40)}%;width:${Math.max(22, 48 - index * 4)}%"></i></div><time>${escapeHtml(record.startDate ?? "")} - ${escapeHtml(record.endDate ?? "")}</time></div>`).join("")}
+      ${renderRelationList(component)}
+    </div>
+    ${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无排期任务" }) : ""}
+  `;
+}
 function renderTimeline(component) {
     const records = normalizeRecords(component.items);
     if (records.length === 0)
@@ -364,6 +575,47 @@ function renderTreeNodes(records, isRoot = false) {
       `;
     })
         .join("")}</ul>`;
+}
+function renderPermissionMatrix(component, context) {
+    return `<div class="permission-matrix-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无权限矩阵")}</div>`;
+}
+function renderAuditLog(component, context) {
+    return `<div class="audit-log-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无审计记录")}</div>`;
+}
+function renderTableBodyOnly(component, context, emptyTitle) {
+    const columns = component.columns ?? component.fields ?? [];
+    const records = normalizeRecords(component.items);
+    if (columns.length === 0 || records.length === 0)
+        return renderEmptyState(component.emptyState ?? { title: emptyTitle });
+    return `<table class="data-table"><thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead><tbody>${records.map((record) => `<tr>${columns.map((column) => `<td>${renderTableCell(record[column.id], column, context)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+function renderRuleList(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<ol class="rule-list-preview">${records.map((record, index) => `<li><span>规则 ${index + 1}</span><strong>${escapeHtml(record.title ?? record.label ?? "规则")}</strong>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</li>`).join("")}</ol>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无规则" }) : ""}`;
+}
+function renderChecklist(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<ul class="checklist-preview">${records.map((record) => `<li><span aria-hidden="true"></span><div><strong>${escapeHtml(record.title ?? record.label ?? "检查项")}</strong>${record.status ? `<em>${escapeHtml(record.status)}</em>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</div></li>`).join("")}</ul>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无检查项" }) : ""}`;
+}
+function renderAttachmentList(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<div class="attachment-list-preview">${records.map((record) => `<article><strong>${escapeHtml(record.title ?? record.name ?? "附件")}</strong>${record.status ? `<span class="status-tag">${escapeHtml(record.status)}</span>` : ""}${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</article>`).join("")}</div>${renderActionBar(component.actions)}${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无附件" }) : ""}`;
+}
+function renderCommentThread(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<ol class="comment-thread-preview">${records.map((record) => `<li><header><strong>${escapeHtml(record.author ?? record.user ?? "评论人")}</strong><time>${escapeHtml(record.time ?? "")}</time></header><p>${escapeHtml(record.content ?? record.description ?? record.title ?? "评论内容")}</p></li>`).join("")}</ol>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无评论" }) : ""}`;
+}
+function renderOrgChart(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<div class="org-chart-preview">${renderTreeNodes(records, true)}${renderRelationList(component)}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无组织结构" }) : ""}`;
+}
+function renderCollapsePanel(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<div class="collapse-panel-preview">${records.map((record, index) => `<details ${index === 0 ? "open" : ""}><summary>${escapeHtml(record.title ?? record.label ?? "信息组")}</summary>${record.description ? `<p>${escapeHtml(record.description)}</p>` : ""}</details>`).join("")}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无折叠内容" }) : ""}`;
+}
+function renderRelationGraph(component) {
+    const records = normalizeRecords(component.items);
+    return `${renderComponentTitle(component)}<div class="relation-graph-preview"><div class="relation-nodes">${records.map((record) => `<span>${escapeHtml(record.title ?? record.label ?? record.id ?? "节点")}</span>`).join("")}</div>${renderRelationList(component)}</div>${records.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无关系节点" }) : ""}`;
 }
 function renderCardList(component) {
     const records = normalizeRecords(component.items);
@@ -536,6 +788,15 @@ function renderNotesBlock(notes, className) {
     if (!notes || notes.length === 0)
         return "";
     return `<div class="${className}">${renderNotes(notes)}</div>`;
+}
+function renderRelationList(component) {
+    if (!component.relations || component.relations.length === 0)
+        return "";
+    return `<ol class="relation-list">${component.relations.map((relation) => `<li><span>${escapeHtml(relation.sourceId)}</span><strong>${escapeHtml(relation.label ?? relation.type ?? "关联")}</strong><span>${escapeHtml(relation.targetId)}</span>${renderNotes(relation.notes)}</li>`).join("")}</ol>`;
+}
+function renderProgressBar(value) {
+    const numericValue = typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
+    return `<div class="progress-bar" aria-label="完成度 ${numericValue}%"><span style="width:${numericValue}%"></span><em>${numericValue}%</em></div>`;
 }
 function styles() {
     return `
@@ -883,7 +1144,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 }
 .actions, .table-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .actions > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-.table-shell {
+.table-shell, .editable-table-shell, .tree-table-shell, .comparison-table-shell {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -925,6 +1186,37 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .data-table tr:last-child td { border-bottom: 0; }
 .data-table tbody tr:hover { background: var(--accent-tint); }
 .data-table td { font-variant-numeric: tabular-nums; }
+.editable-cell {
+  display: inline-flex;
+  min-width: 92px;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #ffffff;
+}
+.row-index {
+  width: 54px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.tree-cell {
+  padding-left: calc(14px + var(--tree-depth, 0) * 22px) !important;
+  font-weight: 650;
+}
+.tree-cell::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-left: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+}
+.comparison-table th:not(:first-child), .comparison-table td:not(:first-child) {
+  text-align: center;
+}
 td.row-actions { display: flex; gap: 10px; }
 .status-tag {
   display: inline-flex;
@@ -1059,6 +1351,52 @@ td.row-actions { display: flex; gap: 10px; }
   overscroll-behavior: contain;
 }
 .drawer-grid { grid-template-columns: 1fr; }
+.kanban-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.kanban-column { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 12px; box-shadow: var(--shadow); }
+.kanban-column h4 { margin: 0 0 10px; color: #334155; font-size: 13px; }
+.kanban-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; margin-bottom: 8px; }
+.kanban-card p { margin: 4px 0 0; font-size: 12px; }
+.workflow-diagram, .wizard-preview, .progress-tracker, .result-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.workflow-nodes { display: flex; flex-wrap: wrap; gap: 10px; }
+.workflow-node { min-width: 150px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.workflow-node span, .wizard-preview li > span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 650; }
+.relation-list { margin: 12px 0 0; padding-left: 20px; color: var(--muted); }
+.relation-list li { margin-top: 6px; }
+.relation-list strong { margin: 0 8px; color: #334155; }
+.wizard-preview ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.wizard-preview li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.wizard-preview li.active { border-color: rgba(37, 99, 235, 0.32); background: var(--accent-tint); }
+.progress-row { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(180px, 320px); gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.progress-row:last-child { border-bottom: 0; }
+.progress-bar { position: relative; height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.progress-bar span { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.progress-bar em { position: absolute; right: 0; top: -22px; color: var(--muted); font-size: 12px; font-style: normal; }
+.result-panel { border-color: rgba(4, 120, 87, 0.22); background: var(--success-soft); }
+.chart-preview, .calendar-preview, .gantt-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.chart-row { display: grid; grid-template-columns: 120px 1fr 72px; gap: 12px; align-items: center; padding: 8px 0; }
+.chart-row div { height: 12px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.chart-row i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.chart-row strong { text-align: right; font-variant-numeric: tabular-nums; }
+.calendar-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.calendar-preview article { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.calendar-preview time { display: block; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.gantt-row { display: grid; grid-template-columns: 150px 1fr 180px; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.gantt-row:last-child { border-bottom: 0; }
+.gantt-row div { height: 18px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
+.gantt-row i { display: block; height: 100%; border-radius: inherit; background: rgba(37, 99, 235, 0.76); }
+.gantt-row time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .timeline-list {
   margin: 0;
   padding: 12px;
@@ -1119,6 +1457,35 @@ td.row-actions { display: flex; gap: 10px; }
   margin-right: 8px;
 }
 .tree-node span { color: var(--muted); font-size: 12px; }
+.permission-matrix-shell, .audit-log-shell, .rule-list-preview, .checklist-preview, .attachment-list-preview, .comment-thread-preview, .org-chart-preview, .collapse-panel-preview, .relation-graph-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.permission-matrix-shell, .audit-log-shell { overflow-x: auto; }
+.rule-list-preview, .checklist-preview, .comment-thread-preview {
+  margin: 0;
+  padding: 12px 14px;
+}
+.rule-list-preview li, .checklist-preview li, .comment-thread-preview li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.rule-list-preview li:last-child, .checklist-preview li:last-child, .comment-thread-preview li:last-child { border-bottom: 0; }
+.rule-list-preview span { display: block; color: var(--muted); font-size: 12px; }
+.checklist-preview { list-style: none; }
+.checklist-preview li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; }
+.checklist-preview li > span { width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 4px; margin-top: 2px; }
+.checklist-preview em { margin-left: 8px; color: var(--muted); font-size: 12px; font-style: normal; }
+.attachment-list-preview { display: grid; gap: 10px; padding: 12px; }
+.attachment-list-preview article { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); padding: 10px; }
+.comment-thread-preview header { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+.org-chart-preview, .collapse-panel-preview, .relation-graph-preview { padding: 12px; }
+.collapse-panel-preview details { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--panel-soft); }
+.collapse-panel-preview summary { cursor: default; font-weight: 650; }
+.relation-nodes { display: flex; flex-wrap: wrap; gap: 8px; }
+.relation-nodes span { border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; background: var(--panel-soft); }
 .card-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .card-list article, .empty-state, .simple-component, .inline-alert {
   border: 1px solid var(--line);

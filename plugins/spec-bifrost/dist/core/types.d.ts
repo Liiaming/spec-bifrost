@@ -48,6 +48,7 @@ export interface ComponentSpec {
     columns?: FieldSpec[];
     actions?: ActionSpec[];
     items?: unknown[];
+    relations?: RelationSpec[];
     emptyState?: EmptyStateSpec;
     notes?: Notes;
 }
@@ -81,6 +82,13 @@ export interface EmptyStateSpec {
     description?: string;
     notes?: Notes;
 }
+export interface RelationSpec {
+    sourceId: string;
+    targetId: string;
+    label?: string;
+    type?: string;
+    notes?: Notes;
+}
 export interface ConditionSpec {
     fieldId?: string;
     operator?: ConditionOperator;
@@ -89,7 +97,7 @@ export interface ConditionSpec {
     any?: ConditionSpec[];
 }
 export type PageType = "list" | "form" | "detail" | "approval" | "reference";
-export type ComponentType = "pageHeader" | "section" | "form" | "filterBar" | "table" | "descriptionList" | "cardList" | "steps" | "metricList" | "timeline" | "treeList" | "tabs" | "alert" | "emptyState" | "modal" | "drawer" | "actionBar" | "textBlock";
+export type ComponentType = "pageHeader" | "section" | "form" | "filterBar" | "table" | "descriptionList" | "cardList" | "steps" | "metricList" | "timeline" | "treeList" | "tabs" | "alert" | "emptyState" | "modal" | "drawer" | "actionBar" | "textBlock" | "editableTable" | "treeTable" | "comparisonTable" | "kanbanBoard" | "workflowDiagram" | "wizard" | "progressTracker" | "resultPanel" | "chart" | "calendar" | "gantt" | "permissionMatrix" | "ruleList" | "checklist" | "auditLog" | "attachmentList" | "commentThread" | "orgChart" | "collapsePanel" | "relationGraph";
 export type FieldType = "text" | "textarea" | "number" | "currency" | "date" | "dateRange" | "time" | "select" | "multiSelect" | "radio" | "checkbox" | "switch" | "user" | "department" | "file" | "status" | "tag";
 export type ActionType = "navigate" | "openModal" | "closeModal" | "openDrawer" | "closeDrawer" | "setFieldValue" | "submitPrototype" | "resetFields" | "showMessage";
 export type ConditionOperator = "equals" | "notEquals" | "in" | "notIn" | "empty" | "notEmpty" | "greaterThan" | "greaterThanOrEqual" | "lessThan" | "lessThanOrEqual" | "contains";

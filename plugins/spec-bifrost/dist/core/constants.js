@@ -18,7 +18,27 @@ export const SUPPORTED_COMPONENT_TYPES = [
     "modal",
     "drawer",
     "actionBar",
-    "textBlock"
+    "textBlock",
+    "editableTable",
+    "treeTable",
+    "comparisonTable",
+    "kanbanBoard",
+    "workflowDiagram",
+    "wizard",
+    "progressTracker",
+    "resultPanel",
+    "chart",
+    "calendar",
+    "gantt",
+    "permissionMatrix",
+    "ruleList",
+    "checklist",
+    "auditLog",
+    "attachmentList",
+    "commentThread",
+    "orgChart",
+    "collapsePanel",
+    "relationGraph"
 ];
 export const SUPPORTED_FIELD_TYPES = [
     "text",
