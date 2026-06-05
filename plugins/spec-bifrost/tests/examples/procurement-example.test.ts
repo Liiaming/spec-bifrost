@@ -16,6 +16,7 @@ test("procurement example covers MVP schema capabilities", async () => {
           columns?: Array<{ type: string; visibleWhen?: unknown; enabledWhen?: unknown; requiredWhen?: unknown }>;
           actions?: Array<{ id: string; type: string; actionWhen?: unknown; targetPageId?: string }>;
           items?: unknown[];
+          relations?: Array<{ sourceId: string; targetId: string }>;
         }>;
       }>;
     }>;
@@ -51,6 +52,31 @@ test("procurement example covers MVP schema capabilities", async () => {
   for (const componentType of ["metricList", "tabs", "drawer", "modal", "timeline", "treeList"]) {
     assert.equal(components.some((component) => component.type === componentType), true, `missing component type ${componentType}`);
   }
+  for (const componentType of [
+    "editableTable",
+    "treeTable",
+    "comparisonTable",
+    "kanbanBoard",
+    "workflowDiagram",
+    "wizard",
+    "progressTracker",
+    "resultPanel",
+    "chart",
+    "calendar",
+    "gantt",
+    "permissionMatrix",
+    "ruleList",
+    "checklist",
+    "auditLog",
+    "attachmentList",
+    "commentThread",
+    "orgChart",
+    "collapsePanel",
+    "relationGraph"
+  ]) {
+    assert.equal(components.some((component) => component.type === componentType), true, `missing component type ${componentType}`);
+  }
+  assert.equal(components.some((component) => component.relations && component.relations.length > 0), true);
   assert.equal(components.some((component) => component.actions?.some((action) => /batch/i.test(action.id) || /批量/.test(action.id))), true);
 });
 

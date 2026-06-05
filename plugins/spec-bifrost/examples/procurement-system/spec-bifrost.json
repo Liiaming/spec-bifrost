@@ -76,6 +76,29 @@
               "notes": ["指标用于表达审批人和采购专员进入列表前需要快速掌握的业务状态。"]
             },
             {
+              "id": "requestKanban",
+              "type": "kanbanBoard",
+              "title": "申请状态看板",
+              "items": [
+                { "title": "草稿", "children": [{ "title": "REQ-2026-001", "description": "行政部办公用品采购" }] },
+                { "title": "审批中", "children": [{ "title": "REQ-2026-008", "description": "研发部开发工具授权" }] },
+                { "title": "待采购", "children": [{ "title": "REQ-2026-012", "description": "固定资产采购已通过审批" }] },
+                { "title": "已完成", "children": [{ "title": "REQ-2026-018", "description": "显示器采购已验收" }] }
+              ],
+              "notes": ["看板用于表达列表页需要按业务状态聚合申请卡片。"]
+            },
+            {
+              "id": "budgetUsageChart",
+              "type": "chart",
+              "title": "本月预算占用",
+              "items": [
+                { "label": "办公用品", "value": 68 },
+                { "label": "软件服务", "value": 42 },
+                { "label": "固定资产", "value": 86 }
+              ],
+              "notes": ["图表只表达预算占用事实，不指定图表库。"]
+            },
+            {
               "id": "purchaseTable",
               "type": "table",
               "columns": [
@@ -106,6 +129,17 @@
           "id": "baseInfo",
           "title": "基本信息",
           "components": [
+            {
+              "id": "createWizard",
+              "type": "wizard",
+              "title": "创建申请向导",
+              "items": [
+                { "title": "基础信息", "description": "填写标题、采购类型、申请部门和预算金额。" },
+                { "title": "采购明细", "description": "补充物品、数量、单价、预算科目和供应商。" },
+                { "title": "附件确认", "description": "上传报价单、预算说明或合同扫描件。" },
+                { "title": "提交审批", "description": "根据金额进入普通审批或大额审批路径。" }
+              ]
+            },
             {
               "id": "purchaseForm",
               "type": "form",
@@ -142,6 +176,45 @@
                 { "id": "saveDraft", "type": "showMessage", "label": "保存草稿", "message": "草稿已保存到本地原型状态", "notes": ["MVP 只表达交互反馈，不持久化真实数据。"] },
                 { "id": "submitNormal", "type": "submitPrototype", "label": "提交普通审批", "targetPageId": "purchase-detail", "actionWhen": { "fieldId": "amount", "operator": "lessThanOrEqual", "value": 50000 }, "message": "已提交普通审批", "notes": ["提交后申请人不能修改明细，只能撤回后重新编辑。"] },
                 { "id": "submitHighAmount", "type": "submitPrototype", "label": "提交大额审批", "targetPageId": "approval-workbench", "actionWhen": { "fieldId": "amount", "operator": "greaterThan", "value": 50000 }, "message": "已进入大额审批路径", "notes": ["超过 50000 的申请需要补充预算说明后进入大额审批。"] }
+              ]
+            },
+            {
+              "id": "lineItemEditor",
+              "type": "editableTable",
+              "title": "采购明细行",
+              "columns": [
+                { "id": "itemName", "label": "物品名称", "type": "text" },
+                { "id": "quantity", "label": "数量", "type": "number" },
+                { "id": "unitPrice", "label": "单价", "type": "currency" },
+                { "id": "budgetSubject", "label": "预算科目", "type": "text" },
+                { "id": "supplier", "label": "候选供应商", "type": "text" }
+              ],
+              "items": [
+                { "itemName": "27 寸显示器", "quantity": 2, "unitPrice": "¥1,600.00", "budgetSubject": "办公设备", "supplier": "优选供应商 A" },
+                { "itemName": "SaaS 授权", "quantity": 10, "unitPrice": "¥360.00", "budgetSubject": "软件服务", "supplier": "合格供应商 B" }
+              ],
+              "actions": [
+                { "id": "addLineItem", "type": "showMessage", "label": "新增明细", "message": "已新增一条采购明细" }
+              ],
+              "notes": ["可编辑明细用于表达一张申请中存在多条采购项和行级校验。"]
+            },
+            {
+              "id": "submitChecklist",
+              "type": "checklist",
+              "title": "提交前资料清单",
+              "items": [
+                { "title": "采购明细至少一行", "status": "必填" },
+                { "title": "软件服务采购上传报价单", "status": "条件必填" },
+                { "title": "大额采购填写预算说明", "status": "条件必填" }
+              ]
+            },
+            {
+              "id": "submitResult",
+              "type": "resultPanel",
+              "title": "提交结果反馈",
+              "emptyState": { "title": "提交成功", "description": "采购申请已进入对应审批流程。" },
+              "actions": [
+                { "id": "backToList", "type": "navigate", "label": "返回申请列表", "targetPageId": "purchase-list" }
               ]
             }
           ]
@@ -223,6 +296,92 @@
                 { "title": "采购专员处理", "time": "2026-06-01 14:00", "description": "确认供应商、报价材料和采购执行口径。", "status": "待处理" }
               ],
               "notes": ["时间线用于表达业务过程中的处理顺序和时间口径。"]
+            },
+            {
+              "id": "approvalWorkflow",
+              "type": "workflowDiagram",
+              "title": "审批工作流",
+              "items": [
+                { "id": "draft", "title": "草稿", "description": "申请人保存或补充信息。" },
+                { "id": "submitted", "title": "已提交", "description": "申请进入审批队列。" },
+                { "id": "departmentApproval", "title": "部门审批", "description": "部门负责人确认必要性。" },
+                { "id": "financeApproval", "title": "财务审批", "description": "财务确认预算归属。" },
+                { "id": "procurementExecution", "title": "采购执行", "description": "采购专员确认供应商和交付。" },
+                { "id": "completed", "title": "完成", "description": "采购验收完成。" },
+                { "id": "rejected", "title": "驳回", "description": "申请人需要修改后重新提交。" }
+              ],
+              "relations": [
+                { "sourceId": "draft", "targetId": "submitted", "label": "提交" },
+                { "sourceId": "submitted", "targetId": "departmentApproval", "label": "部门审批" },
+                { "sourceId": "departmentApproval", "targetId": "financeApproval", "label": "大额审批" },
+                { "sourceId": "financeApproval", "targetId": "procurementExecution", "label": "通过" },
+                { "sourceId": "procurementExecution", "targetId": "completed", "label": "验收" },
+                { "sourceId": "departmentApproval", "targetId": "rejected", "label": "驳回" }
+              ],
+              "notes": ["工作流表达业务节点和流转，不表示技术状态机。"]
+            },
+            {
+              "id": "approvalComments",
+              "type": "commentThread",
+              "title": "审批意见",
+              "items": [
+                { "author": "部门负责人", "time": "2026-06-01 10:20", "content": "采购必要性已确认，预算归属行政部。" },
+                { "author": "财务审批", "time": "2026-06-01 11:35", "content": "预算科目可用，大额申请需补充报价单。" }
+              ]
+            },
+            {
+              "id": "detailAttachments",
+              "type": "attachmentList",
+              "title": "附件列表",
+              "items": [
+                { "title": "供应商报价单.pdf", "status": "已上传", "description": "用于比价和审批确认。" },
+                { "title": "合同扫描件.pdf", "status": "待补充", "description": "采购执行前必须补齐。" },
+                { "title": "验收单.pdf", "status": "未生成", "description": "交付完成后由采购专员上传。" }
+              ]
+            },
+            {
+              "id": "detailAuditLog",
+              "type": "auditLog",
+              "title": "审计日志",
+              "columns": [
+                { "id": "time", "label": "时间", "type": "text" },
+                { "id": "actor", "label": "操作人", "type": "user" },
+                { "id": "event", "label": "事件", "type": "text" }
+              ],
+              "items": [
+                { "time": "2026-06-01 09:00", "actor": "申请人", "event": "提交审批" },
+                { "time": "2026-06-01 10:20", "actor": "部门负责人", "event": "审批通过" },
+                { "time": "2026-06-01 11:35", "actor": "财务审批", "event": "要求补充报价单" }
+              ],
+              "notes": ["审计日志表达业务留痕口径，不定义日志表结构。"]
+            },
+            {
+              "id": "detailCollapsePanels",
+              "type": "collapsePanel",
+              "title": "补充信息",
+              "items": [
+                { "title": "财务信息", "description": "预算科目、可用余额、付款方式和发票要求。" },
+                { "title": "审批备注", "description": "审批人对采购必要性、供应商和交付风险的说明。" },
+                { "title": "附件说明", "description": "报价单、合同、验收单的上传状态和补充要求。" }
+              ]
+            },
+            {
+              "id": "documentRelations",
+              "type": "relationGraph",
+              "title": "关联单据",
+              "items": [
+                { "id": "request", "title": "采购申请" },
+                { "id": "budget", "title": "预算科目" },
+                { "id": "supplier", "title": "供应商" },
+                { "id": "contract", "title": "合同" },
+                { "id": "acceptance", "title": "验收单" }
+              ],
+              "relations": [
+                { "sourceId": "request", "targetId": "budget", "label": "占用" },
+                { "sourceId": "request", "targetId": "supplier", "label": "选择" },
+                { "sourceId": "supplier", "targetId": "contract", "label": "签署" },
+                { "sourceId": "contract", "targetId": "acceptance", "label": "生成" }
+              ]
             }
           ]
         }
@@ -329,6 +488,121 @@
                 }
               ],
               "notes": ["树形结构用于表达层级分类和选择口径，不表示后端分类模型。"]
+            },
+            {
+              "id": "supplierComparison",
+              "type": "comparisonTable",
+              "title": "供应商对比",
+              "columns": [
+                { "id": "metric", "label": "对比项", "type": "text" },
+                { "id": "supplierA", "label": "优选供应商 A", "type": "text" },
+                { "id": "supplierB", "label": "合格供应商 B", "type": "text" },
+                { "id": "supplierC", "label": "临时供应商 C", "type": "text" }
+              ],
+              "items": [
+                { "metric": "报价", "supplierA": "¥12,800.00", "supplierB": "¥13,500.00", "supplierC": "¥12,200.00" },
+                { "metric": "交付周期", "supplierA": "7 天", "supplierB": "10 天", "supplierC": "15 天" },
+                { "metric": "历史评分", "supplierA": "4.8", "supplierB": "4.5", "supplierC": "3.9" }
+              ]
+            },
+            {
+              "id": "deliveryCalendar",
+              "type": "calendar",
+              "title": "交付关键日期",
+              "items": [
+                { "date": "2026-06-05", "title": "合同确认", "status": "待确认" },
+                { "date": "2026-06-12", "title": "供应商发货", "status": "计划中" },
+                { "date": "2026-06-18", "title": "到货验收", "status": "待安排" }
+              ]
+            },
+            {
+              "id": "deliveryGantt",
+              "type": "gantt",
+              "title": "交付排期",
+              "items": [
+                { "id": "contractConfirm", "title": "合同确认", "startDate": "2026-06-01", "endDate": "2026-06-05" },
+                { "id": "stockPreparation", "title": "备货", "startDate": "2026-06-06", "endDate": "2026-06-10" },
+                { "id": "logistics", "title": "物流", "startDate": "2026-06-11", "endDate": "2026-06-15" },
+                { "id": "acceptance", "title": "验收", "startDate": "2026-06-16", "endDate": "2026-06-18" }
+              ],
+              "relations": [
+                { "sourceId": "contractConfirm", "targetId": "stockPreparation", "label": "确认后备货" },
+                { "sourceId": "stockPreparation", "targetId": "logistics", "label": "备货后发货" },
+                { "sourceId": "logistics", "targetId": "acceptance", "label": "到货后验收" }
+              ]
+            },
+            {
+              "id": "supplierProgress",
+              "type": "progressTracker",
+              "title": "供应商资料进度",
+              "items": [
+                { "label": "资质资料", "value": 100, "description": "营业执照和资质文件已确认。" },
+                { "label": "合同确认", "value": 60, "description": "合同条款待法务确认。" },
+                { "label": "交付准备", "value": 35, "description": "供应商正在确认库存。" },
+                { "label": "验收准备", "value": 10, "description": "验收模板尚未补齐。" }
+              ]
+            },
+            {
+              "id": "categoryBudgetTree",
+              "type": "treeTable",
+              "title": "采购类目预算",
+              "columns": [
+                { "id": "name", "label": "类目", "type": "text" },
+                { "id": "owner", "label": "归口部门", "type": "department" },
+                { "id": "budget", "label": "预算余额", "type": "currency" }
+              ],
+              "items": [
+                { "name": "办公用品", "owner": "行政部", "budget": "¥80,000.00", "children": [{ "name": "显示器", "owner": "行政部", "budget": "¥20,000.00" }] },
+                { "name": "软件服务", "owner": "研发部", "budget": "¥120,000.00", "children": [{ "name": "SaaS 订阅", "owner": "研发部", "budget": "¥60,000.00" }] }
+              ]
+            },
+            {
+              "id": "permissionMatrix",
+              "type": "permissionMatrix",
+              "title": "角色权限矩阵",
+              "columns": [
+                { "id": "role", "label": "角色", "type": "text" },
+                { "id": "createRequest", "label": "创建申请", "type": "status" },
+                { "id": "approve", "label": "审批", "type": "status" },
+                { "id": "batchExport", "label": "批量导出", "type": "status" }
+              ],
+              "items": [
+                { "role": "申请人", "createRequest": "允许", "approve": "禁止", "batchExport": "允许本人" },
+                { "role": "审批人", "createRequest": "允许", "approve": "允许", "batchExport": "允许部门" },
+                { "role": "采购专员", "createRequest": "禁止", "approve": "禁止", "batchExport": "允许全部" }
+              ],
+              "notes": ["权限矩阵表达业务权限口径，不表示鉴权实现。"]
+            },
+            {
+              "id": "purchaseRules",
+              "type": "ruleList",
+              "title": "采购业务规则",
+              "items": [
+                { "title": "金额超过 50000 元必须进入大额审批", "description": "审批人需要查看预算说明。" },
+                { "title": "软件服务采购必须上传报价单", "description": "附件缺失时不能提交审批。" },
+                { "title": "批量导出只能导出当前角色有权查看的申请", "description": "避免跨部门查看敏感采购信息。" }
+              ]
+            },
+            {
+              "id": "approvalOrgChart",
+              "type": "orgChart",
+              "title": "审批组织结构",
+              "items": [
+                {
+                  "id": "requester",
+                  "title": "申请人",
+                  "children": [
+                    {
+                      "id": "departmentOwner",
+                      "title": "部门负责人",
+                      "children": [
+                        { "id": "financeOwner", "title": "财务审批" },
+                        { "id": "buyer", "title": "采购专员" }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

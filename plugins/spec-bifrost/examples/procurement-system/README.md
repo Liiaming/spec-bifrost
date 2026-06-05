@@ -42,6 +42,7 @@ docs/spec-bifrost/backend-requirements.md
 - 多页面 B 端系统。
 - optionSets：采购类型、审批状态、供应商等级。
 - 表单、筛选、表格、详情、步骤、卡片。
+- v0.3 组件：可编辑明细表、层级表格、供应商对比、看板、工作流、向导、进度、结果反馈、图表、日历、甘特、权限矩阵、规则清单、检查清单、审计日志、附件列表、评论串、组织结构、折叠面板和关系图。
 - 字段类型：text、textarea、number、currency、date、select、radio、file、department、user、status、tag。
 - 条件显示、条件必填、基于字段值的动作跳转。
 - 页面、section、组件、字段、动作和按钮备注。
