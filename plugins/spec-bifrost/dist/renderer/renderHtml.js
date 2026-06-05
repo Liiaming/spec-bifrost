@@ -468,7 +468,7 @@ function renderWizard(component) {
     return `
     ${renderComponentTitle(component)}
     <div class="wizard-preview">
-      <ol>${steps.map((step, index) => `<li class="${index === 0 ? "active" : ""}"><span>${index + 1}</span><strong>${escapeHtml(step.title ?? step.label ?? `步骤 ${index + 1}`)}</strong>${step.description ? `<p>${escapeHtml(step.description)}</p>` : ""}</li>`).join("")}</ol>
+      <ol>${steps.map((step, index) => `<li class="${index === 0 ? "active" : ""}"><span>${index + 1}</span><div class="wizard-step-copy"><strong>${escapeHtml(step.title ?? step.label ?? `步骤 ${index + 1}`)}</strong>${step.description ? `<p>${escapeHtml(step.description)}</p>` : ""}</div></li>`).join("")}</ol>
     </div>
     ${steps.length === 0 ? renderEmptyState(component.emptyState ?? { title: "暂无向导步骤" }) : ""}
   `;
@@ -1370,8 +1370,10 @@ td.row-actions { display: flex; gap: 10px; }
 .relation-list li { margin-top: 6px; }
 .relation-list strong { margin: 0 8px; color: #334155; }
 .wizard-preview ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.wizard-preview li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.wizard-preview li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
 .wizard-preview li.active { border-color: rgba(37, 99, 235, 0.32); background: var(--accent-tint); }
+.wizard-step-copy { min-width: 0; }
+.wizard-step-copy p { margin: 4px 0 0; }
 .progress-row { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(180px, 320px); gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .progress-row:last-child { border-bottom: 0; }
 .progress-bar { position: relative; height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; }
@@ -1468,6 +1470,7 @@ td.row-actions { display: flex; gap: 10px; }
   margin: 0;
   padding: 12px 14px;
 }
+.rule-list-preview { padding: 12px 14px 12px 36px; }
 .rule-list-preview li, .checklist-preview li, .comment-thread-preview li {
   padding: 10px 0;
   border-bottom: 1px solid var(--line);

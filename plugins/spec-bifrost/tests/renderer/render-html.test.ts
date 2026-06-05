@@ -473,7 +473,9 @@ test("renderPrototypeHtml renders v0.3 flow and state components", () => {
   assert.match(html, /class="workflow-diagram"/);
   assert.match(html, /提交/);
   assert.match(html, /class="wizard-preview"/);
+  assert.match(html, /class="wizard-step-copy"/);
   assert.match(html, /填写基础信息/);
+  assert.match(html, /\.wizard-preview li\s*\{[^}]*grid-template-columns:\s*28px minmax\(0, 1fr\)/);
   assert.match(html, /class="progress-tracker"/);
   assert.match(html, /资料补齐/);
   assert.match(html, /class="result-panel"/);
@@ -588,6 +590,7 @@ test("renderPrototypeHtml renders v0.3 governance collaboration and structure co
   assert.match(html, /class="permission-matrix-shell"/);
   assert.match(html, /部门负责人/);
   assert.match(html, /class="rule-list-preview"/);
+  assert.match(html, /\.rule-list-preview\s*\{\s*padding:\s*12px 14px 12px 36px/);
   assert.match(html, /50000/);
   assert.match(html, /class="checklist-preview"/);
   assert.match(html, /合同扫描件/);
