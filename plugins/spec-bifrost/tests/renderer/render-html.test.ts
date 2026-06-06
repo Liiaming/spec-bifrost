@@ -138,6 +138,7 @@ test("renderPrototypeHtml renders business components instead of schema cards", 
   assert.match(html, /<textarea id="field-remark" name="remark" autocomplete="off"/);
   assert.match(html, /<div class="component-block">/);
   assert.match(html, /\.component-block \+ \.component-block\s*\{\s*margin-top:\s*18px/);
+  assert.match(html, /\.page-header \+ \.section\s*\{\s*padding-top:\s*0;\s*border-top:\s*0;\s*\}/);
   assert.match(html, /金额必须大于 0/);
   assert.doesNotMatch(html, />filterBar<\/span>/);
   assert.doesNotMatch(html, /purchaseFilters/);
@@ -409,9 +410,12 @@ test("renderPrototypeHtml renders v0.3 data table components", () => {
   assert.match(html, /class="editable-table-shell"/);
   assert.match(html, /新增明细/);
   assert.match(html, /class="tree-table-shell"/);
+  assert.match(html, /<div class="component-title"><h3>类目预算<\/h3><\/div>\s*<div class="tree-table-shell">/);
   assert.match(html, /tree-cell/);
   assert.match(html, /办公用品/);
   assert.match(html, /class="comparison-table-shell"/);
+  assert.match(html, /<div class="component-title"><h3>供应商对比<\/h3><\/div>\s*<div class="comparison-table-shell">/);
+  assert.match(html, /\.table-shell, \.editable-table-shell, \.tree-table-shell, \.comparison-table-shell\s*\{[\s\S]*min-width:\s*0;[\s\S]*max-width:\s*100%;/);
   assert.match(html, /供应商 A/);
   assert.doesNotMatch(html, /暂无内容配置/);
 });
@@ -595,6 +599,7 @@ test("renderPrototypeHtml renders v0.3 governance collaboration and structure co
   const html = renderPrototypeHtml({ spec, diagnostics: [] });
 
   assert.match(html, /class="permission-matrix-shell"/);
+  assert.match(html, /<div class="component-title"><h3>权限矩阵<\/h3><\/div><div class="permission-matrix-shell">/);
   assert.match(html, /部门负责人/);
   assert.match(html, /class="rule-list-preview"/);
   assert.match(html, /\.rule-list-preview\s*\{\s*padding:\s*12px 14px 12px 36px/);
@@ -602,6 +607,7 @@ test("renderPrototypeHtml renders v0.3 governance collaboration and structure co
   assert.match(html, /class="checklist-preview"/);
   assert.match(html, /合同扫描件/);
   assert.match(html, /class="audit-log-shell"/);
+  assert.match(html, /<div class="component-title"><h3>审计日志<\/h3><\/div><div class="audit-log-shell">/);
   assert.match(html, /提交审批/);
   assert.match(html, /class="attachment-list-preview"/);
   assert.match(html, /合同\.pdf/);

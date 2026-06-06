@@ -271,8 +271,8 @@ function renderTreeTable(component, context) {
     const columns = component.columns ?? component.fields ?? [];
     const records = normalizeRecords(component.items);
     return `
+    ${renderComponentTitle(component)}
     <div class="tree-table-shell">
-      ${renderComponentTitle(component)}
       <table class="data-table tree-table">
         <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
         <tbody>${records.length > 0 && columns.length > 0 ? renderTreeTableRows(records, columns, context) : ""}</tbody>
@@ -300,8 +300,8 @@ function renderComparisonTable(component, context) {
     const columns = component.columns ?? [];
     const records = normalizeRecords(component.items);
     return `
+    ${renderComponentTitle(component)}
     <div class="comparison-table-shell">
-      ${renderComponentTitle(component)}
       <table class="data-table comparison-table">
         <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
         <tbody>${records.map((record) => `<tr>${columns.map((column) => `<td>${renderTableCell(record[column.id], column, context)}</td>`).join("")}</tr>`).join("")}</tbody>
@@ -577,10 +577,10 @@ function renderTreeNodes(records, isRoot = false) {
         .join("")}</ul>`;
 }
 function renderPermissionMatrix(component, context) {
-    return `<div class="permission-matrix-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无权限矩阵")}</div>`;
+    return `${renderComponentTitle(component)}<div class="permission-matrix-shell">${renderTableBodyOnly(component, context, "暂无权限矩阵")}</div>`;
 }
 function renderAuditLog(component, context) {
-    return `<div class="audit-log-shell">${renderComponentTitle(component)}${renderTableBodyOnly(component, context, "暂无审计记录")}</div>`;
+    return `${renderComponentTitle(component)}<div class="audit-log-shell">${renderTableBodyOnly(component, context, "暂无审计记录")}</div>`;
 }
 function renderTableBodyOnly(component, context, emptyTitle) {
     const columns = component.columns ?? component.fields ?? [];
@@ -1061,6 +1061,10 @@ p { color: var(--muted); line-height: 1.6; }
   padding-top: 20px;
   border-top: 1px solid var(--line);
 }
+.page-header + .section {
+  padding-top: 0;
+  border-top: 0;
+}
 .section-heading {
   display: flex;
   align-items: center;
@@ -1147,6 +1151,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .actions, .table-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .actions > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 .table-shell, .editable-table-shell, .tree-table-shell, .comparison-table-shell {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
