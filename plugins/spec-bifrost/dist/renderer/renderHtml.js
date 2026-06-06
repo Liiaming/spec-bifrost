@@ -32,7 +32,7 @@ export function renderPrototypeHtml(input) {
           <span class="topbar-label">角色</span>
           <div class="actor-list">${input.spec.project.actors.map((actor) => `<span>${escapeHtml(actor)}</span>`).join("")}</div>
         </div>
-        <button class="ghost-button" data-notes-toggle>显示备注</button>
+        <button type="button" class="ghost-button" data-notes-toggle>显示备注</button>
       </div>
       ${input.diagnostics.length > 0 ? `<div class="warning">当前 JSON 存在错误，预览为上一版有效结果</div>` : ""}
       ${input.spec.pages
@@ -51,7 +51,7 @@ export function renderPrototypeHtml(input) {
         .map((section) => `
             <section class="section">
               ${renderSectionHeading(section.title, section.notes)}
-              ${section.components.map((component) => renderComponent(component, context)).join("")}
+              ${section.components.map((component) => `<div class="component-block">${renderComponent(component, context)}</div>`).join("")}
             </section>
           `)
         .join("")}
@@ -671,7 +671,7 @@ function renderFieldControl(field, context, mode) {
 }
 function renderControl(field, context, mode) {
     const options = getOptions(field, context);
-    const controlAttrs = `data-field-control data-field-id="${escapeHtml(field.id)}"`;
+    const controlAttrs = `name="${escapeHtml(field.id)}" autocomplete="off" data-field-control data-field-id="${escapeHtml(field.id)}"`;
     if (field.type === "textarea") {
         return `<textarea id="field-${escapeHtml(field.id)}" ${controlAttrs} rows="4" placeholder="请输入${escapeHtml(field.label)}…"></textarea>`;
     }
@@ -689,7 +689,7 @@ function renderControl(field, context, mode) {
         return `<input id="field-${escapeHtml(field.id)}" type="date" ${controlAttrs} />`;
     }
     if (field.type === "number" || field.type === "currency") {
-        return `<input id="field-${escapeHtml(field.id)}" type="number" ${controlAttrs} placeholder="请输入${escapeHtml(field.label)}…" />`;
+        return `<input id="field-${escapeHtml(field.id)}" type="number" inputmode="decimal" ${controlAttrs} placeholder="请输入${escapeHtml(field.label)}…" />`;
     }
     return `<input id="field-${escapeHtml(field.id)}" type="text" ${controlAttrs} placeholder="请输入${escapeHtml(field.label)}…" />`;
 }
@@ -835,6 +835,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+.app-frame, .workspace, .page, .section, .component-block { min-width: 0; }
 button, input, select, textarea { font: inherit; }
 button {
   cursor: pointer;
@@ -1079,6 +1080,7 @@ p { color: var(--muted); line-height: 1.6; }
 .field-notes { margin-top: 0; }
 .field-notes .notes { max-width: none; }
 .component-title:empty { display: none; }
+.component-block + .component-block { margin-top: 18px; }
 .filter-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -1549,6 +1551,28 @@ td.row-actions { display: flex; gap: 10px; }
   .filter-bar { grid-template-columns: 1fr; }
   .filter-actions { grid-column: 1 / -1; padding-top: 0; }
   .table-toolbar { align-items: flex-start; flex-direction: column; }
+  .metric-list, .card-list, .kanban-board, .calendar-preview {
+    grid-template-columns: 1fr;
+  }
+  .description-list {
+    grid-template-columns: 1fr;
+  }
+  .chart-row, .gantt-row, .progress-row, .timeline-list li {
+    grid-template-columns: 1fr;
+  }
+  .chart-row strong {
+    text-align: left;
+  }
+  .gantt-row div, .progress-bar, .chart-row div {
+    width: 100%;
+  }
+  .workflow-node {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+  .component-block + .component-block {
+    margin-top: 20px;
+  }
   h1 { font-size: 25px; }
 }
 `;

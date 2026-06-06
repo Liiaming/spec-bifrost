@@ -26,6 +26,7 @@ test("renderPrototypeHtml renders navigation page and notes toggle text", () => 
   assert.match(html, /采购申请列表/);
   assert.match(html, /采购申请/);
   assert.match(html, /显示备注/);
+  assert.match(html, /<button type="button" class="ghost-button" data-notes-toggle>显示备注<\/button>/);
   assert.match(html, /列表页/);
   assert.match(html, /\/list/);
   assert.match(html, /列表页用于日常跟踪/);
@@ -124,7 +125,7 @@ test("renderPrototypeHtml renders business components instead of schema cards", 
   const html = renderPrototypeHtml({ spec, diagnostics: [] });
 
   assert.match(html, /<form class="filter-bar"/);
-  assert.match(html, /<select id="field-status"/);
+  assert.match(html, /<select id="field-status" name="status" autocomplete="off"/);
   assert.match(html, /<option value="pending">审批中<\/option>/);
   assert.match(html, /<table class="data-table"/);
   assert.match(html, /3 个字段 · 3 条示例数据/);
@@ -132,8 +133,11 @@ test("renderPrototypeHtml renders business components instead of schema cards", 
   assert.match(html, /<td>REQ-2026-001<\/td>/);
   assert.match(html, /<button type="button" class="text-button" data-action-button data-action-type="navigate" data-target-page-id="detail">查看详情<\/button>/);
   assert.match(html, /<div class="form-grid"/);
-  assert.match(html, /<input id="field-title" type="text"/);
-  assert.match(html, /<textarea id="field-remark"/);
+  assert.match(html, /<input id="field-title" type="text" name="title" autocomplete="off"/);
+  assert.match(html, /<input id="field-amount" type="number" inputmode="decimal" name="amount" autocomplete="off"/);
+  assert.match(html, /<textarea id="field-remark" name="remark" autocomplete="off"/);
+  assert.match(html, /<div class="component-block">/);
+  assert.match(html, /\.component-block \+ \.component-block\s*\{\s*margin-top:\s*18px/);
   assert.match(html, /金额必须大于 0/);
   assert.doesNotMatch(html, />filterBar<\/span>/);
   assert.doesNotMatch(html, /purchaseFilters/);
@@ -534,6 +538,9 @@ test("renderPrototypeHtml renders v0.3 planning and visualization components", (
   assert.match(html, /2026-06-12/);
   assert.match(html, /class="gantt-preview"/);
   assert.match(html, /合同确认/);
+  assert.match(html, /\.calendar-preview\s*\{\s*display: grid; grid-template-columns: repeat\(auto-fit, minmax\(210px, 1fr\)\); gap: 10px; \}/);
+  assert.match(html, /@media \(max-width: 900px\)\s*\{[\s\S]*\.metric-list, \.card-list, \.kanban-board, \.calendar-preview\s*\{\s*grid-template-columns: 1fr;\s*\}/);
+  assert.match(html, /@media \(max-width: 900px\)\s*\{[\s\S]*\.chart-row, \.gantt-row, \.progress-row, \.timeline-list li\s*\{\s*grid-template-columns: 1fr;\s*\}/);
 });
 
 test("renderPrototypeHtml renders v0.3 governance collaboration and structure components", () => {
