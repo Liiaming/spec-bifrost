@@ -6,11 +6,13 @@
 - 新增 `relations` 字段，用于表达工作流、关系图、组织结构和甘特等组件内的业务节点关系，并校验关系端点引用。
 - 为全部 v0.3 组件提供低噪声 B 端语义化预览渲染。
 - 丰富采购申请管理系统示例，覆盖全部 v0.3 组件和前后端导出样例。
+- 统一表格、矩阵和清单类组件的标题层级，修正移动端预览间距和多余分割线。
 - 同步更新中英文 README、插件 README、schema skill、export skill 和预览截图。
 - Expanded v0.3 requirement-expression components with editable tables, tree tables, comparison tables, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, and relation graphs.
 - Added `relations` for business node relationships inside workflows, relation graphs, org charts, and gantt components, with endpoint reference validation.
 - Added low-noise B-end semantic preview rendering for all v0.3 components.
 - Expanded the procurement request management example to cover every v0.3 component and the frontend/backend export samples.
+- Aligned title hierarchy for table, matrix, and list components while fixing mobile preview spacing and redundant dividers.
 - Updated Chinese/English README files, plugin README, schema skill, export skill, and the preview screenshot.
 
 ## 0.2.1
