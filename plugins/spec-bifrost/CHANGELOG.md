@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.4.0
+
+- 新增 OpenCode 配置入口 `plugins/spec-bifrost/opencode.json`，提供 `/spec-bifrost-*` 命令并复用现有 Spec Bifrost skills。
+- 同步更新中文 README、英文 README 和插件 README，说明 OpenCode 通过 `OPENCODE_CONFIG` 使用本仓库配置。
+- 将根 package、Claude manifest 和 Codex manifest 版本同步更新到 `0.4.0`。
+- Added the OpenCode config entrypoint `plugins/spec-bifrost/opencode.json`, exposing `/spec-bifrost-*` commands that reuse the existing Spec Bifrost skills.
+- Updated the Chinese README, English README, and plugin README with OpenCode usage through `OPENCODE_CONFIG`.
+- Bumped the root package, Claude manifest, and Codex manifest versions to `0.4.0`.
+
 ## 0.3.0
 
 - 扩展 v0.3 需求表达组件，新增可编辑明细表、层级表格、对比表、看板、工作流、向导、进度、结果反馈、图表、日历、甘特、权限矩阵、规则清单、检查清单、审计日志、附件列表、评论串、组织结构、折叠面板和关系图。

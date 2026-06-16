@@ -2,7 +2,7 @@
 
 [中文](README.md)
 
-Spec Bifrost is an AI requirement collaboration plugin for product managers, indie developers, and small teams. It turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
+Spec Bifrost is an AI requirement collaboration plugin for product managers, indie developers, and small teams. In Claude Code, Codex, or OpenCode, it turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
 
 Spec Bifrost is not another prompt pack that asks AI to write a requirements document directly. It puts a validated, previewable, and editable JSON layer between the conversation and the final documents, so Claude Code or Codex can keep iterating from structured context.
 
@@ -14,7 +14,7 @@ Spec Bifrost is not another prompt pack that asks AI to write a requirements doc
 
 - For product managers: turn natural language into previewable business-facing prototypes and requirement notes.
 - For indie developers: convert scattered product ideas into frontend and backend requirement documents.
-- For small teams: collaborate with AI around one local JSON artifact in Claude Code or Codex.
+- For small teams: collaborate with AI around one local JSON artifact in Claude Code, Codex, or OpenCode.
 - For open source contributors: help shape an early project about stable AI requirement collaboration.
 
 ## Why not just ask AI to write requirements directly
@@ -40,10 +40,10 @@ Product prototypes are intuitive for people, but not stable enough for AI and en
 
 Spec Bifrost explores a lighter workflow:
 
-1. Product managers describe a complete but relatively simple business-facing system in Claude Code or Codex chat.
-2. Claude Code or Codex creates and edits the local `spec-bifrost.json`.
+1. Product managers describe a complete but relatively simple business-facing system in Claude Code, Codex, or OpenCode chat.
+2. Claude Code, Codex, or OpenCode creates and edits the local `spec-bifrost.json`.
 3. The plugin validates the JSON and serves a local preview.
-4. After product confirmation, Claude Code or Codex exports frontend-focused and backend-focused requirement documents from the JSON.
+4. After product confirmation, Claude Code, Codex, or OpenCode exports frontend-focused and backend-focused requirement documents from the JSON.
 
 ```mermaid
 flowchart LR
@@ -58,7 +58,7 @@ flowchart LR
 
 ## What It Does
 
-- Guides Claude Code or Codex to create and modify `spec-bifrost.json` through skills.
+- Guides Claude Code, Codex, or OpenCode to create and modify `spec-bifrost.json` through skills and commands.
 - Validates JSON syntax, schema, and reference integrity.
 - Provides medium-fidelity, multi-page business-facing prototype previews.
 - Supports notes on pages, sections, components, fields, actions, and buttons.
@@ -67,7 +67,7 @@ flowchart LR
 - Supports richer requirement components such as editable tables, tree tables, comparison tables, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, and relation graphs.
 - Supports field rules, conditional display, conditional required fields, and page navigation.
 - Uses a last-known-good renderer strategy and keeps the previous valid preview when the current JSON cannot render.
-- Guides Claude Code or Codex to export frontend and backend Markdown requirement documents.
+- Guides Claude Code, Codex, or OpenCode to export frontend and backend Markdown requirement documents.
 
 ## What It Does Not Do
 
@@ -92,6 +92,7 @@ flowchart LR
 │   ├── bin/spec-bifrost
 │   ├── examples/procurement-system/
 │   ├── hooks/hooks.json
+│   ├── opencode.json
 │   ├── skills/
 │   ├── src/
 │   │   ├── cli/
@@ -107,14 +108,15 @@ flowchart LR
 - `plugins/spec-bifrost/src/hooks`: Claude Code and Codex hook integration.
 - `plugins/spec-bifrost/src/renderer`: Local preview server and HTML renderer.
 - `plugins/spec-bifrost/src/cli`: Local CLI command entry.
-- `plugins/spec-bifrost/skills`: Skill instructions loadable by Claude Code and Codex.
+- `plugins/spec-bifrost/opencode.json`: OpenCode command entrypoint that reuses the same skills.
+- `plugins/spec-bifrost/skills`: Skill instructions loadable by Claude Code, Codex, and OpenCode.
 - `plugins/spec-bifrost/tests`: Tests organized by module.
 
 ## Requirements
 
 - Node.js 24 LTS is recommended.
 - npm is required.
-- Claude Code CLI or OpenAI Codex CLI/Desktop with plugin support is required.
+- Claude Code CLI, OpenAI Codex CLI/Desktop with plugin support, or OpenCode is required.
 
 ## Install
 
@@ -133,6 +135,14 @@ codex plugin add spec-bifrost@spec-bifrost-marketplace
 ```
 
 In Codex Desktop, after the same marketplace is registered, the plugin uses `.codex-plugin/plugin.json` `interface` metadata for the plugin UI.
+
+OpenCode does not use the Claude/Codex marketplace. Keep or clone this repository, then start OpenCode in the target project directory with the repository-provided config:
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
+```
+
+`OPENCODE_CONFIG` loads the `/spec-bifrost-*` commands from `plugins/spec-bifrost/opencode.json`. The command templates inline the sibling skill documents through OpenCode `{file:...}` variables, so they do not rely on additional skill discovery.
 
 Published versions must include `plugins/spec-bifrost/dist` so the installed `spec-bifrost` CLI can run directly after marketplace install. Before publishing, run `npm run build` and commit the generated `plugins/spec-bifrost/dist` files.
 
@@ -167,6 +177,17 @@ After product confirmation, export the two requirement documents:
 
 ```txt
 /spec-bifrost:export
+```
+
+In OpenCode, use the corresponding hyphenated command names:
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-refresh
+/spec-bifrost-export
+/spec-bifrost-stop
 ```
 
 The exported files are expected at:
@@ -220,6 +241,12 @@ claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 
 For a Codex local marketplace install, rerun marketplace add or remove/add to refresh source changes, depending on the Codex CLI version in use.
 
+OpenCode local testing does not need a marketplace install. After build, start it from the test project directory:
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
+```
+
 ## Claude Code / Codex Skills
 
 ```txt
@@ -237,6 +264,24 @@ For a Codex local marketplace install, rerun marketplace add or remove/add to re
 - `/spec-bifrost:refresh`: Asks the running preview to reload the current JSON.
 - `/spec-bifrost:export`: Guides Claude Code or Codex to write frontend and backend requirement documents.
 - `/spec-bifrost:stop`: Inspects and manually frees port `3737` when it is still held by a preview process.
+
+## OpenCode Commands
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-refresh
+/spec-bifrost-export
+/spec-bifrost-stop
+```
+
+- `/spec-bifrost-spec`: Guides OpenCode to create or modify the local prototype JSON.
+- `/spec-bifrost-validate`: Validates syntax, schema, and references.
+- `/spec-bifrost-preview`: Starts the local preview server.
+- `/spec-bifrost-refresh`: Asks the running preview to reload the current JSON.
+- `/spec-bifrost-export`: Guides OpenCode to write frontend and backend requirement documents.
+- `/spec-bifrost-stop`: Inspects and manually frees port `3737` when it is still held by a preview process.
 
 Exported documents are expected at:
 

@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-面向产品经理、独立开发者和小团队的 AI 需求协作插件：把聊天里的产品想法沉淀为本地 `spec-bifrost.json`，实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
+面向产品经理、独立开发者和小团队的 AI 需求协作插件：在 Claude Code、Codex 或 OpenCode 中把聊天里的产品想法沉淀为本地 `spec-bifrost.json`，实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
 
 Spec Bifrost 不是又一个“让 AI 直接写一篇需求文档”的提示词集合。它把需求先落到一个可校验、可预览、可迭代的 JSON 中间层，再让 AI 基于这个结构化上下文继续修改、预览和导出。
 
@@ -14,7 +14,7 @@ Spec Bifrost 不是又一个“让 AI 直接写一篇需求文档”的提示词
 
 - 面向产品经理：用自然语言快速形成可预览的 B 端原型和需求说明。
 - 面向独立开发者：把零散想法整理成工程师能读的前后端需求文档。
-- 面向小团队：在 Claude Code 或 Codex 中围绕同一份本地 JSON 做 AI 需求协作。
+- 面向小团队：在 Claude Code、Codex 或 OpenCode 中围绕同一份本地 JSON 做 AI 需求协作。
 - 面向开源贡献者：参与一个聚焦“AI 如何稳定表达产品需求”的早期开源项目。
 
 ## 为什么不是直接让 AI 写需求文档
@@ -40,10 +40,10 @@ Spec Bifrost 的核心选择是加一个本地 `spec-bifrost.json` 中间层：
 
 Spec Bifrost 试图验证一条更轻量的链路：
 
-1. 产品经理通过 Claude Code 或 Codex 聊天描述完整但相对简单的 B 端系统。
-2. Claude Code 或 Codex 创建和修改本地 `spec-bifrost.json`。
+1. 产品经理通过 Claude Code、Codex 或 OpenCode 聊天描述完整但相对简单的 B 端系统。
+2. Claude Code、Codex 或 OpenCode 创建和修改本地 `spec-bifrost.json`。
 3. 插件校验 JSON，并提供本地预览服务。
-4. 产品确认后，Claude Code 或 Codex 基于 JSON 导出前端关注版和后端关注版需求文档。
+4. 产品确认后，Claude Code、Codex 或 OpenCode 基于 JSON 导出前端关注版和后端关注版需求文档。
 
 ```mermaid
 flowchart LR
@@ -58,7 +58,7 @@ flowchart LR
 
 ## 能做什么
 
-- 通过 Claude Code 或 Codex skills 引导创建和修改 `spec-bifrost.json`。
+- 通过 Claude Code、Codex 或 OpenCode 的 skills/commands 引导创建和修改 `spec-bifrost.json`。
 - 校验 JSON 语法、schema 和引用完整性。
 - 提供中保真、多页面 B 端原型预览。
 - 支持页面、section、组件、字段、动作和按钮上的 notes。
@@ -67,7 +67,7 @@ flowchart LR
 - 支持可编辑明细、层级表格、对比表、看板、工作流、向导、进度、结果反馈、图表、日历、甘特、权限矩阵、规则清单、检查清单、审计日志、附件列表、评论串、组织结构、折叠面板和关系图。
 - 支持字段规则、条件显示、条件必填和页面跳转。
 - renderer 使用 last known good 策略，当前 JSON 渲染失败时保留上一版有效预览。
-- 指导 Claude Code 或 Codex 导出前端版和后端版 Markdown 需求文档。
+- 指导 Claude Code、Codex 或 OpenCode 导出前端版和后端版 Markdown 需求文档。
 
 ## 不做什么
 
@@ -92,6 +92,7 @@ flowchart LR
 │   ├── bin/spec-bifrost
 │   ├── examples/procurement-system/
 │   ├── hooks/hooks.json
+│   ├── opencode.json
 │   ├── skills/
 │   ├── src/
 │   │   ├── cli/
@@ -107,14 +108,15 @@ flowchart LR
 - `plugins/spec-bifrost/src/hooks`：Claude Code 和 Codex hook 集成。
 - `plugins/spec-bifrost/src/renderer`：本地预览服务和 HTML 渲染器。
 - `plugins/spec-bifrost/src/cli`：本地 CLI 命令入口。
-- `plugins/spec-bifrost/skills`：Claude Code 和 Codex 可加载的技能说明。
+- `plugins/spec-bifrost/opencode.json`：OpenCode 命令入口，复用同一组 skills。
+- `plugins/spec-bifrost/skills`：Claude Code、Codex 和 OpenCode 可加载的技能说明。
 - `plugins/spec-bifrost/tests`：按模块组织的测试。
 
 ## 环境要求
 
 - 推荐 Node.js 24 LTS。
 - 需要 npm。
-- 需要支持 plugin 的 Claude Code CLI 或 OpenAI Codex CLI/Desktop。
+- 需要支持 plugin 的 Claude Code CLI、OpenAI Codex CLI/Desktop，或 OpenCode。
 
 ## 安装
 
@@ -133,6 +135,14 @@ codex plugin add spec-bifrost@spec-bifrost-marketplace
 ```
 
 在 Codex Desktop 中，注册同一个 marketplace 后，插件会使用 `.codex-plugin/plugin.json` 的 `interface` 元数据在插件界面中展示。
+
+OpenCode 不使用 Claude/Codex marketplace。保留或 clone 本仓库后，在目标项目目录用仓库内 OpenCode 配置启动：
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
+```
+
+`OPENCODE_CONFIG` 加载 `plugins/spec-bifrost/opencode.json` 中的 `/spec-bifrost-*` 命令。命令模板会通过 OpenCode 的 `{file:...}` 变量内联同目录下的 skill 文档，不依赖额外的 skill discovery。
 
 发布版本需要包含 `plugins/spec-bifrost/dist`，这样 marketplace 安装后的 `spec-bifrost` CLI 可以直接运行。发布前请先运行 `npm run build`，并把生成的 `plugins/spec-bifrost/dist` 一起提交。
 
@@ -167,6 +177,17 @@ codex plugin add spec-bifrost@spec-bifrost-marketplace
 
 ```txt
 /spec-bifrost:export
+```
+
+在 OpenCode 中使用对应的 hyphenated 命令名：
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-refresh
+/spec-bifrost-export
+/spec-bifrost-stop
 ```
 
 导出结果默认写入：
@@ -220,6 +241,12 @@ claude plugin update spec-bifrost@spec-bifrost-marketplace --scope local
 
 Codex 本地 marketplace 安装后，如需刷新源码改动，重新运行 marketplace add 或 remove/add，以当前 Codex CLI 版本的插件命令为准。
 
+OpenCode 本地测试不需要安装 marketplace。构建后在测试项目目录启动：
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
+```
+
 ## Claude Code / Codex Skills
 
 ```txt
@@ -237,6 +264,24 @@ Codex 本地 marketplace 安装后，如需刷新源码改动，重新运行 mar
 - `/spec-bifrost:refresh`：让运行中的预览重新读取当前 JSON。
 - `/spec-bifrost:export`：引导 Claude Code 或 Codex 写入前端版和后端版需求文档。
 - `/spec-bifrost:stop`：排查并手动释放被预览进程占用的 `3737` 端口。
+
+## OpenCode Commands
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-refresh
+/spec-bifrost-export
+/spec-bifrost-stop
+```
+
+- `/spec-bifrost-spec`：引导 OpenCode 创建或修改本地原型 JSON。
+- `/spec-bifrost-validate`：校验语法、schema 和引用。
+- `/spec-bifrost-preview`：启动本地预览服务。
+- `/spec-bifrost-refresh`：让运行中的预览重新读取当前 JSON。
+- `/spec-bifrost-export`：引导 OpenCode 写入前端版和后端版需求文档。
+- `/spec-bifrost-stop`：排查并手动释放被预览进程占用的 `3737` 端口。
 
 导出文档默认写入：
 

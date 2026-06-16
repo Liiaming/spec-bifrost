@@ -1,6 +1,6 @@
 {
   "name": "spec-bifrost",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Create, validate, preview, and export page-driven B-end requirement prototypes from local JSON.",
   "author": {
     "name": "Spec Bifrost"

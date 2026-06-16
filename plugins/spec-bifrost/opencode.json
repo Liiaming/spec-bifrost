@@ -1,0 +1,35 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "command": {
+    "spec-bifrost-spec": {
+      "description": "Spec Bifrost: create or modify spec-bifrost.json",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/spec/SKILL.md}\n\n## Bundled schema reference\n\n{file:./skills/spec/schema.md}\n\n## Bundled examples reference\n\n{file:./skills/spec/examples.md}\n\n## Bundled export reference\n\n{file:./skills/spec/export.md}\n\nUser request:\n$ARGUMENTS"
+    },
+    "spec-bifrost-validate": {
+      "description": "Spec Bifrost: validate spec-bifrost.json",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/validate/SKILL.md}\n\nUser request:\n$ARGUMENTS"
+    },
+    "spec-bifrost-preview": {
+      "description": "Spec Bifrost: start the local preview service",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/preview/SKILL.md}\n\nUser request:\n$ARGUMENTS"
+    },
+    "spec-bifrost-refresh": {
+      "description": "Spec Bifrost: refresh the running preview",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/refresh/SKILL.md}\n\nUser request:\n$ARGUMENTS"
+    },
+    "spec-bifrost-export": {
+      "description": "Spec Bifrost: export frontend and backend requirement documents",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/export/SKILL.md}\n\nUser request:\n$ARGUMENTS"
+    },
+    "spec-bifrost-stop": {
+      "description": "Spec Bifrost: stop a lingering preview process",
+      "agent": "build",
+      "template": "Follow these bundled Spec Bifrost instructions for this OpenCode command. Do not rely on external skill discovery.\n\n{file:./skills/stop/SKILL.md}\n\nUser request:\n$ARGUMENTS"
+    }
+  }
+}

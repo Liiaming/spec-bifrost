@@ -115,6 +115,42 @@ test("Codex hook config loads from plugin root without Claude-only paths", async
   assert.equal(commandEntry.command, "node ./dist/hooks/postToolUseValidate.js");
 });
 
+test("OpenCode config exposes namespaced Spec Bifrost commands", async () => {
+  const configPath = "plugins/spec-bifrost/opencode.json";
+  const config = await readJson(configPath);
+
+  assertRecord(config, configPath);
+  assert.equal(config.$schema, "https://opencode.ai/config.json");
+  assert.equal(config.skills, undefined);
+
+  const command = config.command;
+  assertRecord(command, `${configPath}.command`);
+
+  const expectedCommands = {
+    "spec-bifrost-spec": "spec",
+    "spec-bifrost-validate": "validate",
+    "spec-bifrost-preview": "preview",
+    "spec-bifrost-refresh": "refresh",
+    "spec-bifrost-export": "export",
+    "spec-bifrost-stop": "stop"
+  };
+
+  for (const [commandName, skillName] of Object.entries(expectedCommands)) {
+    const entry: unknown = command[commandName];
+    assertRecord(entry, `${configPath}.command.${commandName}`);
+    assert.equal(entry.agent, "build");
+    assert.match(String(entry.description), /Spec Bifrost/);
+    assert.match(String(entry.template), /bundled Spec Bifrost instructions/);
+    assert.match(String(entry.template), new RegExp(`\\{file:\\./skills/${skillName}/SKILL\\.md\\}`));
+  }
+
+  const specCommand = command["spec-bifrost-spec"];
+  assertRecord(specCommand, `${configPath}.command.spec-bifrost-spec`);
+  assert.match(String(specCommand.template), /\{file:\.\/skills\/spec\/schema\.md\}/);
+  assert.match(String(specCommand.template), /\{file:\.\/skills\/spec\/examples\.md\}/);
+  assert.match(String(specCommand.template), /\{file:\.\/skills\/spec\/export\.md\}/);
+});
+
 test("stop skill documents manual preview port cleanup", async () => {
   const skillPath = "plugins/spec-bifrost/skills/stop/SKILL.md";
   const text = await readFile(skillPath, "utf8");
@@ -170,6 +206,21 @@ test("README files document export steps, outputs, and boundaries", async () => 
     assert.match(text, /业务对象|business objects/);
     assert.match(text, /接口定义|API definitions/);
     assert.match(text, /数据库|database/);
+  }
+});
+
+test("README files document OpenCode setup and command names", async () => {
+  const readmePaths = ["README.md", "README.en.md", "plugins/spec-bifrost/README.md"];
+
+  for (const readmePath of readmePaths) {
+    const text = await readFile(readmePath, "utf8");
+    assert.match(text, /OpenCode/);
+    assert.match(text, /OPENCODE_CONFIG/);
+    assert.match(text, /plugins\/spec-bifrost\/opencode\.json/);
+    assert.match(text, /\/spec-bifrost-spec/);
+    assert.match(text, /\/spec-bifrost-validate/);
+    assert.match(text, /\/spec-bifrost-preview/);
+    assert.match(text, /\/spec-bifrost-export/);
   }
 });
 

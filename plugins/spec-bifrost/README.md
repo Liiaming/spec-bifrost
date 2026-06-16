@@ -1,8 +1,8 @@
 # Spec Bifrost
 
-Spec Bifrost 是一个面向产品经理、独立开发者和小团队的 Claude Code / OpenAI Codex 插件，用于把 AI 需求协作沉淀为本地 `spec-bifrost.json`，预览页面驱动的 B 端需求原型，并导出前端版和后端版需求文档。
+Spec Bifrost 是一个面向产品经理、独立开发者和小团队的 Claude Code / OpenAI Codex / OpenCode 插件，用于把 AI 需求协作沉淀为本地 `spec-bifrost.json`，预览页面驱动的 B 端需求原型，并导出前端版和后端版需求文档。
 
-Spec Bifrost is a Claude Code / OpenAI Codex plugin for product managers, indie developers, and small teams. It turns AI requirement collaboration into a local `spec-bifrost.json`, previews page-driven business-facing prototypes, and exports frontend and backend requirement documents.
+Spec Bifrost is a Claude Code / OpenAI Codex / OpenCode plugin for product managers, indie developers, and small teams. It turns AI requirement collaboration into a local `spec-bifrost.json`, previews page-driven business-facing prototypes, and exports frontend and backend requirement documents.
 
 ![Spec Bifrost preview](../../docs/assets/spec-bifrost-preview.png)
 
@@ -28,8 +28,8 @@ flowchart LR
 
 ## 能做什么 / What It Does
 
-- 通过聊天指导 Claude Code 或 Codex 创建和修改 `spec-bifrost.json`。
-- Guides Claude Code or Codex to create and modify `spec-bifrost.json` through chat.
+- 通过聊天指导 Claude Code、Codex 或 OpenCode 创建和修改 `spec-bifrost.json`。
+- Guides Claude Code, Codex, or OpenCode to create and modify `spec-bifrost.json` through chat.
 - 校验 JSON 语法、schema 和引用完整性。
 - Validates JSON syntax, schema, and references.
 - 启动多页面 B 端原型的本地预览。
@@ -42,8 +42,8 @@ flowchart LR
 - Supports editable tables, tree tables, comparison tables, kanban boards, workflows, wizards, progress trackers, result panels, charts, calendars, gantt plans, permission matrices, rule lists, checklists, audit logs, attachment lists, comment threads, org charts, collapse panels, and relation graphs.
 - 当前 JSON 无法渲染时，保留上一版有效预览。
 - Keeps last known good preview output when the current JSON cannot render.
-- 指导 Claude Code 或 Codex 导出前端和后端 Markdown 需求文档。
-- Guides Claude Code or Codex to export frontend and backend Markdown requirement documents.
+- 指导 Claude Code、Codex 或 OpenCode 导出前端和后端 Markdown 需求文档。
+- Guides Claude Code, Codex, or OpenCode to export frontend and backend Markdown requirement documents.
 
 ## 不做什么 / What It Does Not Do
 
@@ -73,6 +73,17 @@ flowchart LR
 /spec-bifrost:stop
 ```
 
+OpenCode 使用 hyphenated 命令名 / OpenCode uses hyphenated command names:
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-refresh
+/spec-bifrost-export
+/spec-bifrost-stop
+```
+
 ## 安装 / Install
 
 ```bash
@@ -84,6 +95,18 @@ claude plugin install spec-bifrost@spec-bifrost-marketplace
 codex plugin marketplace add Liiaming/spec-bifrost
 codex plugin add spec-bifrost@spec-bifrost-marketplace
 ```
+
+OpenCode 不使用 Claude/Codex marketplace。保留或 clone 本仓库后，在目标项目目录用仓库内配置启动：
+
+OpenCode does not use the Claude/Codex marketplace. Keep or clone this repository, then start OpenCode in the target project directory with the repository-provided config:
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
+```
+
+`OPENCODE_CONFIG` 加载 `plugins/spec-bifrost/opencode.json` 中的 `/spec-bifrost-*` 命令。命令模板会通过 OpenCode 的 `{file:...}` 变量内联同目录下的 skill 文档，不依赖额外的 skill discovery。
+
+`OPENCODE_CONFIG` loads the `/spec-bifrost-*` commands from `plugins/spec-bifrost/opencode.json`. The command templates inline the sibling skill documents through OpenCode `{file:...}` variables, so they do not rely on additional skill discovery.
 
 发布版本必须包含 `dist`，安装后 CLI 才能直接运行。
 
@@ -100,6 +123,15 @@ Published versions must include `dist` so the CLI can run immediately after inst
 /spec-bifrost:validate
 /spec-bifrost:preview
 /spec-bifrost:export
+```
+
+OpenCode:
+
+```txt
+/spec-bifrost-spec
+/spec-bifrost-validate
+/spec-bifrost-preview
+/spec-bifrost-export
 ```
 
 默认预览地址是 `http://127.0.0.1:3737`。如果端口没有释放，运行 `/spec-bifrost:stop`。
@@ -124,6 +156,12 @@ The frontend version should cover pages, flows, page-level details, field-level 
 ```bash
 codex plugin marketplace add /path/to/spec-bifrost
 codex plugin add spec-bifrost@spec-bifrost-marketplace
+```
+
+OpenCode:
+
+```bash
+OPENCODE_CONFIG=/path/to/spec-bifrost/plugins/spec-bifrost/opencode.json opencode
 ```
 
 ## 本地 CLI / Local CLI
