@@ -1,5 +1,14 @@
 # 更新日志 / Changelog
 
+## 0.4.1
+
+- 优化预览工作台的配色、层级、间距与移动端控件尺寸，降低模板化和装饰性视觉噪声。
+- 改进预览可访问性，补充跳转主内容链接、导航与备注切换状态、状态消息语义和减少动态效果支持。
+- 更新 README 预览截图以匹配当前渲染效果。
+- Refined the preview workspace palette, hierarchy, spacing, and mobile control sizing to reduce templated and decorative visual noise.
+- Improved preview accessibility with a skip link, navigation and notes-toggle states, semantic status messages, and reduced-motion support.
+- Updated the README preview screenshot to match the current renderer.
+
 ## 0.4.0
 
 - 新增 OpenCode 配置入口 `plugins/spec-bifrost/opencode.json`，提供 `/spec-bifrost-*` 命令并复用现有 Spec Bifrost skills。
