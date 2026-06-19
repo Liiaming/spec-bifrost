@@ -5,7 +5,9 @@ document.addEventListener("click", (event) => {
   if (!(target instanceof HTMLElement)) return;
   if (target.matches("[data-notes-toggle]")) {
     document.body.classList.toggle("show-notes");
-    target.textContent = document.body.classList.contains("show-notes") ? "隐藏备注" : "显示备注";
+    const notesVisible = document.body.classList.contains("show-notes");
+    target.textContent = notesVisible ? "隐藏备注" : "显示备注";
+    target.setAttribute("aria-pressed", String(notesVisible));
     return;
   }
   const actionButton = target.closest("[data-action-button]");
@@ -44,7 +46,13 @@ function navigateToPage(pageId) {
     page.toggleAttribute("hidden", page.getAttribute("data-page") !== pageId);
   });
   document.querySelectorAll(".nav button[data-page-id]").forEach((button) => {
-    button.classList.toggle("active", button.getAttribute("data-page-id") === pageId);
+    const active = button.getAttribute("data-page-id") === pageId;
+    button.classList.toggle("active", active);
+    if (active) {
+      button.setAttribute("aria-current", "page");
+    } else {
+      button.removeAttribute("aria-current");
+    }
   });
   applyCurrentPageConditions();
 }
@@ -161,6 +169,8 @@ function showPrototypeMessage(message) {
   if (!(toast instanceof HTMLElement)) {
     toast = document.createElement("div");
     toast.className = "prototype-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
     document.body.appendChild(toast);
   }
   toast.textContent = message;

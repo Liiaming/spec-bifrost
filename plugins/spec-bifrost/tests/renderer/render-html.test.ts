@@ -25,8 +25,11 @@ test("renderPrototypeHtml renders navigation page and notes toggle text", () => 
 
   assert.match(html, /采购申请列表/);
   assert.match(html, /采购申请/);
+  assert.match(html, /<a class="skip-link" href="#main-content">跳到主要内容<\/a>/);
+  assert.match(html, /<main class="workspace" id="main-content">/);
   assert.match(html, /显示备注/);
-  assert.match(html, /<button type="button" class="ghost-button" data-notes-toggle>显示备注<\/button>/);
+  assert.match(html, /<button type="button" class="ghost-button" data-notes-toggle aria-pressed="false">显示备注<\/button>/);
+  assert.match(html, /data-page-id="list" aria-current="page"/);
   assert.match(html, /列表页/);
   assert.match(html, /\/list/);
   assert.match(html, /列表页用于日常跟踪/);
@@ -139,6 +142,7 @@ test("renderPrototypeHtml renders business components instead of schema cards", 
   assert.match(html, /<div class="component-block">/);
   assert.match(html, /\.component-block \+ \.component-block\s*\{\s*margin-top:\s*18px/);
   assert.match(html, /\.page-header \+ \.section\s*\{\s*padding-top:\s*0;\s*border-top:\s*0;\s*\}/);
+  assert.doesNotMatch(html, /border-(?:left|right):\s*3px solid var\(--accent\)/);
   assert.match(html, /金额必须大于 0/);
   assert.doesNotMatch(html, />filterBar<\/span>/);
   assert.doesNotMatch(html, /purchaseFilters/);
@@ -254,6 +258,10 @@ test("renderPrototypeHtml emits condition metadata and runtime hooks", () => {
   assert.match(html, /addEventListener\("input", applyCurrentPageConditions\)/);
   assert.match(html, /addEventListener\("change", applyCurrentPageConditions\)/);
   assert.match(html, /function evaluateCondition/);
+  assert.match(html, /target\.setAttribute\("aria-pressed", String\(notesVisible\)\)/);
+  assert.match(html, /button\.setAttribute\("aria-current", "page"\)/);
+  assert.match(html, /toast\.setAttribute\("role", "status"\)/);
+  assert.match(html, /toast\.setAttribute\("aria-live", "polite"\)/);
 });
 
 test("renderPrototypeHtml renders requirement expressiveness components", () => {
