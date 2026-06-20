@@ -2,20 +2,20 @@
 
 [中文](README.md)
 
-Spec Bifrost is an AI requirement collaboration plugin for product managers, indie developers, and small teams. In Claude Code, Codex, or OpenCode, it turns product conversations into a local `spec-bifrost.json`, previews multi-page business-facing requirement prototypes from that JSON, and exports separate frontend and backend Markdown requirement documents.
+Spec Bifrost is for product and engineering teams planning new business-facing systems. When both sides already use AI but do not share context, Spec Bifrost connects them through a local, validatable, previewable, and versionable `spec-bifrost.json`.
 
-Spec Bifrost is not another prompt pack that asks AI to write a requirements document directly. It puts a validated, previewable, and editable JSON layer between the conversation and the final documents, so Claude Code or Codex can keep iterating from structured context.
+It is an AI requirement collaboration plugin for product managers and engineers. Product works with AI to describe and review requirements. Engineering and its AI tools continue from the same structured requirement artifact. The team does not need to trust AI-generated production code first, or repeatedly explain pages, fields, flows, rules, and notes.
 
-> Status: MVP. The project is turning the "chat + local JSON + live prototype + role-specific requirement documents" workflow into something trustworthy, demonstrable, and open to contributors.
+> Status: MVP. The current version is focused on validating whether product and engineering can review and hand off one shared AI-readable requirement artifact, not on adding more component types.
 
 ![Spec Bifrost preview](docs/assets/spec-bifrost-preview.png)
 
 ## Who It Is For
 
-- For product managers: turn natural language into previewable business-facing prototypes and requirement notes.
-- For indie developers: convert scattered product ideas into frontend and backend requirement documents.
-- For small teams: collaborate with AI around one local JSON artifact in Claude Code, Codex, or OpenCode.
-- For open source contributors: help shape an early project about stable AI requirement collaboration.
+- Small and large companies planning a new internal tool, operations platform, or other business-facing system.
+- Teams where product and engineering both use AI, but their conversations, prompts, and context remain disconnected.
+- Teams that do not fully trust AI-generated production code and want reviewable requirements, prototypes, and rules first.
+- Teams willing to run the full workflow with both product and engineering, rather than only view a generated prototype.
 
 ## Why not just ask AI to write requirements directly
 
@@ -36,24 +36,26 @@ That means AI does not need to repeatedly process large screenshot descriptions,
 
 ## Why
 
-Product prototypes are intuitive for people, but not stable enough for AI and engineering workflows. Developers often need to rewrite prototypes, notes, and verbal context into structured text, which can introduce quality drift.
+Product and engineering both using AI does not mean they share context. After product-side AI creates a prototype or document, engineering often has to explain business objects, field meanings, process outcomes, and exceptions again. That second explanation introduces context loss and semantic drift.
 
-Spec Bifrost explores a lighter workflow:
+Spec Bifrost explores a shared requirement artifact workflow:
 
-1. Product managers describe a complete but relatively simple business-facing system in Claude Code, Codex, or OpenCode chat.
-2. Claude Code, Codex, or OpenCode creates and edits the local `spec-bifrost.json`.
+1. Product describes a new business-facing system in Claude Code, Codex, or OpenCode.
+2. AI creates and edits the local `spec-bifrost.json`.
 3. The plugin validates the JSON and serves a local preview.
-4. After product confirmation, Claude Code, Codex, or OpenCode exports frontend-focused and backend-focused requirement documents from the JSON.
+4. Product corrects pages, flows, fields, rules, and notes from the preview.
+5. Engineering reviews the same JSON and lets engineering-side AI continue from it.
+6. The team exports frontend and backend requirement documents from the same artifact.
 
 ```mermaid
 flowchart LR
-  A["Product idea / Chat"] --> B["spec-bifrost.json"]
-  B --> C["validate"]
-  C --> D["preview"]
-  D --> E["Product review"]
-  E --> F["export"]
-  F --> G["frontend-requirements.md"]
-  F --> H["backend-requirements.md"]
+  A["Product-side AI conversation"] --> B["spec-bifrost.json"]
+  B --> C["validate + preview"]
+  C --> D["Product review"]
+  D --> B
+  B --> E["Engineering review and AI"]
+  E --> B
+  B --> F["Frontend and backend requirement documents"]
 ```
 
 ## What It Does
@@ -200,6 +202,18 @@ docs/spec-bifrost/backend-requirements.md
 - The frontend version focuses on the page list, page flow, page-level details, field-level rules, and user-facing feedback.
 - The backend version focuses on business objects, field meanings, business rules, process outcomes, exceptions, and notes.
 - Both files must remain requirement documents and must not include API definitions, database designs, technical architecture, code structure, or task breakdowns.
+
+### Turn the example into a team trial
+
+Running the procurement example confirms installation and preview behavior. A useful trial also requires product and engineering to complete these steps together:
+
+1. Create a `spec-bifrost.json` for a real but sanitized new business-facing project.
+2. Have product correct at least one requirement from the preview.
+3. Have engineering review the same JSON and identify at least one ambiguity, omission, or directly reusable piece of context.
+4. Export the frontend and backend requirement documents.
+5. Submit [trial feedback](https://github.com/Liiaming/spec-bifrost/issues/new?template=adoption_feedback.yml) with the completed stage and a concrete value or blocker.
+
+See [`plugins/spec-bifrost/examples/procurement-system/README.md`](plugins/spec-bifrost/examples/procurement-system/README.md) for the full procurement example trial guide.
 
 ## Install for Local Development Testing
 
@@ -362,6 +376,12 @@ Spec Bifrost is designed around local files:
 - Real product prototypes may contain sensitive business information; review examples and test data before publishing.
 
 See `plugins/spec-bifrost/SECURITY.md` for more detail.
+
+## Trial Feedback
+
+The current phase prioritizes evidence from real trials over feature ideas from people who have not tried the workflow. If you ran the example or created a spec for your own business-facing project, submit [structured trial feedback](https://github.com/Liiaming/spec-bifrost/issues/new?template=adoption_feedback.yml).
+
+Useful feedback includes the project scenario, completed stage, and a concrete value or blocker. Do not submit customer names, credentials, or sensitive business data.
 
 ## Contributing
 

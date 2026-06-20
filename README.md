@@ -2,20 +2,20 @@
 
 [English](README.en.md)
 
-面向产品经理、独立开发者和小团队的 AI 需求协作插件：在 Claude Code、Codex 或 OpenCode 中把聊天里的产品想法沉淀为本地 `spec-bifrost.json`，实时预览多页面 B 端需求原型，并导出面向前端和后端的两份 Markdown 需求文档。
+面向正在从零建设 B 端系统的产品研发团队：当产品和开发已经各自使用 AI、却没有共享上下文时，Spec Bifrost 用一份本地、可校验、可预览、可版本化的 `spec-bifrost.json` 连接双方。
 
-Spec Bifrost 不是又一个“让 AI 直接写一篇需求文档”的提示词集合。它把需求先落到一个可校验、可预览、可迭代的 JSON 中间层，再让 AI 基于这个结构化上下文继续修改、预览和导出。
+这是一款面向产品经理和开发共同使用的 AI 需求协作插件。产品用 AI 描述和审查需求，开发继续让 AI 读取同一份结构化需求资产。团队不需要先信任 AI 生成的生产代码，也不需要反复转述页面、字段、流程、规则和备注。
 
-> 状态：MVP。当前目标是把“聊天 + 本地 JSON + 实时原型 + 角色裁剪需求文档”做成可信、可演示、可参与的开源工作流。
+> 状态：MVP。当前版本重点验证“产品与开发能否围绕同一份 AI 可读需求资产完成评审和交接”，而不是继续扩展组件数量。
 
 ![Spec Bifrost preview](docs/assets/spec-bifrost-preview.png)
 
 ## 适合谁
 
-- 面向产品经理：用自然语言快速形成可预览的 B 端原型和需求说明。
-- 面向独立开发者：把零散想法整理成工程师能读的前后端需求文档。
-- 面向小团队：在 Claude Code、Codex 或 OpenCode 中围绕同一份本地 JSON 做 AI 需求协作。
-- 面向开源贡献者：参与一个聚焦“AI 如何稳定表达产品需求”的早期开源项目。
+- 正在从零规划内部系统、运营后台或其他 B 端系统的小公司和大公司。
+- 产品和开发都已经使用 AI，但两侧对话、提示词和上下文彼此分离的团队。
+- 不愿直接信任 AI 生成生产代码，希望先审查需求、原型和规则的团队。
+- 愿意让产品与开发共同试跑完整流程，而不是只看一次原型演示的团队。
 
 ## 为什么不是直接让 AI 写需求文档
 
@@ -36,24 +36,26 @@ Spec Bifrost 的核心选择是加一个本地 `spec-bifrost.json` 中间层：
 
 ## 为什么
 
-产品原型对人直观，但对 AI 和工程流程并不稳定。开发通常还需要把原型、备注和口头说明二次转述成结构化文字，质量容易漂移。
+产品和开发都在使用 AI，并不代表他们在共享上下文。产品侧 AI 形成原型或文档后，开发仍常常需要重新解释业务对象、字段口径、流程结果和例外，第二次转述会带来上下文丢失和语义漂移。
 
-Spec Bifrost 试图验证一条更轻量的链路：
+Spec Bifrost 验证的是一条共享需求资产链路：
 
-1. 产品经理通过 Claude Code、Codex 或 OpenCode 聊天描述完整但相对简单的 B 端系统。
-2. Claude Code、Codex 或 OpenCode 创建和修改本地 `spec-bifrost.json`。
-3. 插件校验 JSON，并提供本地预览服务。
-4. 产品确认后，Claude Code、Codex 或 OpenCode 基于 JSON 导出前端关注版和后端关注版需求文档。
+1. 产品通过 Claude Code、Codex 或 OpenCode 描述一个新的 B 端系统。
+2. AI 创建并修改本地 `spec-bifrost.json`。
+3. 插件校验 JSON，并提供本地预览。
+4. 产品根据预览修正页面、流程、字段、规则和备注。
+5. 开发审查同一份 JSON，并让开发侧 AI 继续读取它。
+6. 团队从同一份需求资产导出前端版和后端版需求文档。
 
 ```mermaid
 flowchart LR
-  A["产品想法 / Chat"] --> B["spec-bifrost.json"]
-  B --> C["validate"]
-  C --> D["preview"]
-  D --> E["产品确认"]
-  E --> F["export"]
-  F --> G["frontend-requirements.md"]
-  F --> H["backend-requirements.md"]
+  A["产品侧 AI 对话"] --> B["spec-bifrost.json"]
+  B --> C["validate + preview"]
+  C --> D["产品评审"]
+  D --> B
+  B --> E["开发评审与开发侧 AI"]
+  E --> B
+  B --> F["前端版与后端版需求文档"]
 ```
 
 ## 能做什么
@@ -200,6 +202,18 @@ docs/spec-bifrost/backend-requirements.md
 - 前端版需求文档关注页面清单、页面流程、页面级说明、字段级说明和操作反馈。
 - 后端版需求文档关注业务对象与字段口径、业务规则、流程结果、例外与备注。
 - 两份文档都应保持需求文档属性，不包含接口定义、数据库设计、技术架构、代码结构或任务拆分。
+
+### 把示例升级为一次团队试用
+
+仅运行采购系统示例可以确认安装和预览是否正常；有效试用还需要产品和开发共同完成以下步骤：
+
+1. 用一个真实但已脱敏的新 B 端项目创建自己的 `spec-bifrost.json`。
+2. 产品根据预览修正至少一处需求。
+3. 开发审查同一份 JSON，并指出至少一处歧义、缺失或可直接复用的信息。
+4. 导出前端版和后端版需求文档。
+5. 提交[试用反馈](https://github.com/Liiaming/spec-bifrost/issues/new?template=adoption_feedback.yml)，说明完成阶段、具体价值或具体阻塞。
+
+完整采购示例试跑指南见 [`plugins/spec-bifrost/examples/procurement-system/README.md`](plugins/spec-bifrost/examples/procurement-system/README.md)。
 
 ## 本地开发测试安装
 
@@ -362,6 +376,12 @@ Spec Bifrost 围绕本地文件工作：
 - 真实产品原型可能包含敏感业务信息；发布前请检查示例和测试数据。
 
 更多信息见 `plugins/spec-bifrost/SECURITY.md`。
+
+## 试用反馈
+
+当前阶段优先收集真实团队的使用证据，而不是未试用的功能设想。如果你已经运行示例或为自己的 B 端项目创建了 spec，请提交[结构化试用反馈](https://github.com/Liiaming/spec-bifrost/issues/new?template=adoption_feedback.yml)。
+
+有效反馈需要包含项目场景、完成阶段，以及具体价值或具体阻塞。请勿提交客户名称、凭据或敏感业务数据。
 
 ## 贡献
 

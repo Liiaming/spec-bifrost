@@ -1,16 +1,16 @@
 # Spec Bifrost
 
-Spec Bifrost 是一个面向产品经理、独立开发者和小团队的 Claude Code / OpenAI Codex / OpenCode 插件，用于把 AI 需求协作沉淀为本地 `spec-bifrost.json`，预览页面驱动的 B 端需求原型，并导出前端版和后端版需求文档。
+Spec Bifrost 面向正在规划新 B 端系统、但产品侧 AI 与开发侧 AI 上下文彼此分离的产品研发团队。它把 AI 需求协作沉淀为本地、可校验、可预览、可版本化的 `spec-bifrost.json` 共享需求资产，供产品和开发共同评审，并导出前端版和后端版需求文档。
 
-Spec Bifrost is a Claude Code / OpenAI Codex / OpenCode plugin for product managers, indie developers, and small teams. It turns AI requirement collaboration into a local `spec-bifrost.json`, previews page-driven business-facing prototypes, and exports frontend and backend requirement documents.
+Spec Bifrost is for product and engineering teams planning new business-facing systems while product-side and engineering-side AI remain disconnected. It captures AI requirement collaboration in a local, validatable, previewable, and versionable `spec-bifrost.json` as a shared requirement artifact, then exports frontend and backend requirement documents.
 
 ![Spec Bifrost preview](../../docs/assets/spec-bifrost-preview.png)
 
 ## 为什么不是直接让 AI 写需求文档 / Why not just ask AI to write requirements directly
 
-直接让 AI 写文档很快，但页面、字段、备注、交互规则和角色侧重点容易漂移。Spec Bifrost 先把需求落到可校验、可预览、可迭代的 JSON 中间层，再基于同一份结构化上下文导出文档。
+直接让 AI 写文档很快，但产品侧 AI 形成的页面、字段、备注、交互规则和业务口径，到了开发侧通常仍需重复解释。Spec Bifrost 先把需求落到可校验、可预览、可迭代的 JSON 中间层，让产品评审和开发评审围绕同一份结构化上下文进行。
 
-Direct AI-generated documents are fast, but pages, fields, notes, interaction rules, and role-specific focus can drift. Spec Bifrost first captures requirements in a validatable, previewable, and editable JSON layer, then exports documents from the same structured context.
+Direct AI-generated documents are fast, but pages, fields, notes, interaction rules, and business meanings from product-side AI usually need to be explained again to engineering-side AI. Spec Bifrost captures requirements in a validatable, previewable, and editable JSON layer so product review and engineering review use the same structured context.
 
 相比“产品用 AI 生成原型，再由开发用 AI 将原型转换为代码或需求说明”，Spec Bifrost 围绕紧凑的 `spec-bifrost.json` 迭代，通常更省 token，也更适合 token 成本敏感的早期产品阶段。
 
@@ -18,12 +18,13 @@ Compared with a workflow where product uses AI to generate a prototype and devel
 
 ```mermaid
 flowchart LR
-  A["产品想法 / Product idea"] --> B["spec-bifrost.json"]
-  B --> C["validate"]
-  C --> D["preview"]
-  D --> E["export"]
-  E --> F["frontend-requirements.md"]
-  E --> G["backend-requirements.md"]
+  A["产品侧 AI / Product-side AI"] --> B["spec-bifrost.json"]
+  B --> C["validate + preview"]
+  C --> D["产品评审 / Product review"]
+  D --> B
+  B --> E["开发评审 / Engineering review"]
+  E --> B
+  B --> F["前端版与后端版需求文档 / Requirement documents"]
 ```
 
 ## 能做什么 / What It Does
@@ -151,6 +152,16 @@ docs/spec-bifrost/backend-requirements.md
 
 The frontend version should cover pages, flows, page-level details, field-level rules, and user-facing feedback. The backend version should cover business objects, field meanings, business rules, process outcomes, exceptions, and notes. Both documents remain requirement documents, not API definitions, database designs, architecture, code structure, or task breakdowns.
 
+仅运行采购系统示例可以确认安装、校验和预览是否正常。完整试用还需要在一个真实但已脱敏的新 B 端项目中创建自己的 spec，完成产品评审、开发评审和文档导出。
+
+Running the procurement example confirms installation, validation, and preview behavior. A complete trial also requires a real but sanitized new business-facing project, your own spec, product review, engineering review, and document export.
+
+完成或被阻塞后，请提交结构化试用反馈：
+
+After completing the workflow or getting blocked, submit structured trial feedback:
+
+https://github.com/Liiaming/spec-bifrost/issues/new?template=adoption_feedback.yml
+
 ## 本地安装 / Local Install
 
 ```bash
@@ -174,9 +185,9 @@ spec-bifrost refresh --cwd "${CLAUDE_PROJECT_DIR:-$PWD}"
 
 ## 示例 / Example
 
-使用 `examples/procurement-system/spec-bifrost.json` 试跑完整流程。
+使用 `examples/procurement-system/spec-bifrost.json` 验证安装、校验、预览和导出，再在自己的真实脱敏项目中完成产品与开发共同试跑。
 
-Use `examples/procurement-system/spec-bifrost.json` to try the full flow.
+Use `examples/procurement-system/spec-bifrost.json` to verify installation, validation, preview, and export, then run the product-and-engineering workflow on your own real but sanitized project.
 
 示例目录包含一组前端版和后端版导出样例：
 
