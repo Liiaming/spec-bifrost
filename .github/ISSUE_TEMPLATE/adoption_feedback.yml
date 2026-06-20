@@ -1,0 +1,89 @@
+name: Trial feedback / 试用反馈
+description: Share what happened after trying Spec Bifrost in a real B-end project.
+title: "feedback: "
+labels: ["user-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢实际试用 Spec Bifrost。请删除客户名称、业务数据和其他敏感信息。
+
+        Thanks for trying Spec Bifrost. Remove customer names, business data, and other sensitive information before submitting.
+  - type: dropdown
+    id: team
+    attributes:
+      label: Team setup / 团队组合
+      description: Who participated in the trial?
+      options:
+        - Product and engineering / 产品与开发
+        - Product only / 仅产品
+        - Engineering only / 仅开发
+        - Founder or independent builder / 创始人或独立开发者
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: B-end project scenario / B 端项目场景
+      description: What kind of internal or business-facing system were you planning?
+      placeholder: "Example: a new supplier onboarding and approval system."
+    validations:
+      required: true
+  - type: checkboxes
+    id: stages
+    attributes:
+      label: Completed stages / 已完成阶段
+      description: Select every stage you actually completed.
+      options:
+        - label: Understood the shared-requirement workflow / 理解共享需求资产工作流
+        - label: Installed Spec Bifrost / 完成安装
+        - label: Ran the procurement example / 运行采购系统示例
+        - label: Created a spec for our own project / 为自己的项目创建 spec
+        - label: Completed product review / 完成产品评审
+        - label: Completed engineering review / 完成开发评审
+        - label: Exported frontend and backend requirement documents / 导出前后端需求文档
+        - label: Reused it in another project / 在第二个项目继续使用
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Concrete value / 具体价值
+      description: What repeated explanation, context loss, or semantic drift did it reduce?
+      placeholder: "Describe a before-and-after observation. Leave blank if the trial was blocked before value appeared."
+    validations:
+      required: false
+  - type: textarea
+    id: blocker
+    attributes:
+      label: Concrete blocker / 具体阻塞
+      description: What exact step failed or became too costly?
+      placeholder: "Include the command, stage, expected result, and actual result when possible."
+    validations:
+      required: false
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Current outcome / 当前结果
+      options:
+        - Completed the full workflow / 完成完整闭环
+        - Partially completed and will continue / 部分完成并会继续
+        - Blocked and cannot continue / 被阻塞，无法继续
+        - Evaluated but decided not to continue / 评估后决定不继续
+    validations:
+      required: true
+  - type: textarea
+    id: next
+    attributes:
+      label: Most important next need / 最重要的下一步需求
+      description: Name one change, document, or clarification that would most improve the workflow.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check / 隐私检查
+      options:
+        - label: I removed customer names, credentials, and sensitive business data. / 我已删除客户名称、凭据和敏感业务数据。
+          required: true
